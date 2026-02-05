@@ -1,0 +1,18 @@
+Command: ninja all
+[1/9] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\bootloader\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/esp/pulverisateur_fw/carte_relais/build/bootloader/bootloader.bin"
+Bootloader binary size 0x66c0 bytes. 0x940 bytes (8%) free.
+[2/9] No install step for 'bootloader'
+[3/9] Completed 'bootloader'
+[4/9] Building CXX object esp-idf/gestion_http/CMakeFiles/__idf_gestion_http.dir/http_handlers.cpp.obj
+[5/9] Linking C static library esp-idf\gestion_http\libgestion_http.a
+[6/9] Generating esp-idf/esp_system/ld/sections.ld
+[7/9] Linking CXX executable pulverisateur_arriere.elf
+[8/9] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+Generated C:/esp/pulverisateur_fw/carte_relais/build/pulverisateur_arriere.bin
+[9/9] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/esp/pulverisateur_fw/carte_relais/build/partition_table/partition-table.bin C:/esp/pulverisateur_fw/carte_relais/build/pulverisateur_arriere.bin"
+pulverisateur_arriere.bin binary size 0xe0380 bytes. Smallest app partition is 0x100000 bytes. 0x1fc80 bytes (12%) free.

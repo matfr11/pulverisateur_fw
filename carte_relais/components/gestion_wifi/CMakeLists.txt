@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS 
+        "wifi_manager.cpp"
+        "wifi_ap.cpp"
+        "wifi_sta.cpp"
+        "wifi_events.cpp"
+    INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../main"
+    REQUIRES 
+        esp_wifi
+        esp_netif
+        nvs_flash
+        esp_event
+        cjson
+)

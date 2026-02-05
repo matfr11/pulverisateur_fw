@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS 
+        "http_server.cpp"
+        "http_handlers.cpp"
+        "http_status.cpp"
+    INCLUDE_DIRS 
+        "."
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+    REQUIRES 
+        esp_http_server
+        esp_wifi
+        nvs_flash
+        cjson
+        gestion_mqtt
+        gestion_actionneurs
+        gestion_capteurs
+)

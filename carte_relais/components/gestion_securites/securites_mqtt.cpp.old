@@ -1,0 +1,123 @@
+/**
+ * @file securites_mqtt.cpp
+ * @brief Publications MQTT pour sécurités
+ * @version 1.0
+ * @date 2026-02-02
+ */
+
+#include "securites.h"
+#include "mqtt_manager.h"
+#include "mqtt_topics.h"
+#include "board_config.h"
+#include "esp_log.h"
+#include "cJSON.h"
+#include "esp_timer.h"
+
+static const char* TAG = "SECU_MQTT";
+
+extern "C" {
+    esp_err_t mqtt_publish(const char* topic, const char* payload, int qos, bool retain);
+}
+
+// ============================================================================
+// PUBLICATION ALERTES
+// ============================================================================
+
+/**
+ * @brief Publie une alerte sécurité
+ */
+    
+    ESP_LOGW(TAG, "Publication alerte: [%s] %s (niveau %d)", type, description, niveau);
+    
+    // Construire JSON
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "type", type);
+    cJSON_AddStringToObject(json, "description", description);
+    cJSON_AddNumberToObject(json, "niveau", niveau);
+    cJSON_AddNumberToObject(json, "timestamp_ms", esp_timer_get_time() / 1000);
+    
+    // Niveau en string
+    const char* niveau_str = "INFO";
+    if (niveau == 1) niveau_str = "WARNING";
+    else if (niveau >= 2) niveau_str = "CRITIQUE";
+    cJSON_AddStringToObject(json, "niveau_str", niveau_str);
+    
+    char* payload = cJSON_PrintUnformatted(json);
+    
+    // Publier
+    extern esp_err_t mqtt_publish(const char*, const char*, int, bool);
+    mqtt_publish("pulverisateur/securites/alertes", payload, 1, false);
+    
+    cJSON_Delete(json);
+    free(payload);
+}
+
+/**
+ * @brief Publie l'état cuve vide
+ */
+void securites_publier_etat_cuve_vide(etat_cuve_avant_t etat) {
+    cJSON* json = cJSON_CreateObject();
+    
+    const char* etat_str = "OK";
+    switch (etat) {
+        case ETAT_CUVE_AVANT_VIDE: etat_str = "VIDE"; break;
+        //case ETAT_CUVE_AVANT_NIVEAU_BAS: etat_str = "NIVEAU_BAS"; break;
+        default: break;
+    }
+    
+    cJSON_AddStringToObject(json, "etat", etat_str);
+    cJSON_AddNumberToObject(json, "timestamp_ms", esp_timer_get_time() / 1000);
+    
+    char* payload = cJSON_PrintUnformatted(json);
+    
+    extern esp_err_t mqtt_publish(const char*, const char*, int, bool);
+    mqtt_publish(TOPIC_SECURITE_CUVE_VIDE, payload, 1, true); // Retain
+    
+    cJSON_Delete(json);
+    free(payload);
+    
+    ESP_LOGD(TAG, "État cuve publié: %s", etat_str);
+}
+
+/**
+ * @brief Publie timeout vanne
+ */
+void securites_publier_timeout_vanne(const char* vanne, uint32_t timeout_ms) {
+    if (vanne == NULL) {
+        return;
+    }
+    
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "vanne", vanne);
+    cJSON_AddNumberToObject(json, "timeout_ms", timeout_ms);
+    cJSON_AddNumberToObject(json, "timestamp_ms", esp_timer_get_time() / 1000);
+    
+    char* payload = cJSON_PrintUnformatted(json);
+    
+    extern esp_err_t mqtt_publish(const char*, const char*, int, bool);
+    mqtt_publish(TOPIC_SECURITE_TIMEOUT_VANNE, payload, 1, false);
+    
+    cJSON_Delete(json);
+    free(payload);
+    
+    ESP_LOGW(TAG, "Timeout vanne publié: %s (%lu ms)", vanne, timeout_ms);
+}
+
+/**
+ * @brief Publie état arrêt d'urgence
+ */
+void securites_publier_arret_urgence(bool actif) {
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddBoolToObject(json, "actif", actif);
+    cJSON_AddNumberToObject(json, "timestamp_ms", esp_timer_get_time() / 1000);
+    
+    char* payload = cJSON_PrintUnformatted(json);
+    
+    extern esp_err_t mqtt_publish(const char*, const char*, int, bool);
+    mqtt_publish("pulverisateur/securites/arret_urgence", payload, 1, true); // Retain
+    
+    cJSON_Delete(json);
+    free(payload);
+    
+    ESP_LOGW(TAG, "État arrêt d'urgence publié: %s", actif ? "ACTIF" : "LIBÉRÉ");
+}

@@ -1,0 +1,16 @@
+idf_component_register(
+    SRCS 
+        "configuration_manager.cpp"
+        "configuration_nvs.cpp"
+        "configuration_mqtt.cpp"
+    INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+        PRIV_REQUIRES 
+        main
+    REQUIRES 
+        nvs_flash
+        gestion_mqtt
+        cjson
+)

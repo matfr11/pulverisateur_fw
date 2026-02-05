@@ -1,0 +1,22 @@
+idf_component_register(
+    SRCS 
+        "mqtt_manager.cpp"
+        "mqtt_client.cpp"
+        "mqtt_handlers.cpp"
+        "mqtt_publish.cpp"
+        "mqtt_publish_config.cpp"
+    INCLUDE_DIRS 
+        "."
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+        "../../main"
+    REQUIRES 
+        mqtt
+        cjson
+        esp_event
+        esp_timer
+        esp_netif
+        gestion_actionneurs
+        nvs_flash
+)

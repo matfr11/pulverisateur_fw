@@ -1,0 +1,18 @@
+idf_component_register(
+    SRCS 
+        "actionneurs_manager.cpp"
+        "actionneurs_avant.cpp"
+        "actionneurs_arriere.cpp"
+        "actionneurs_mqtt.cpp"
+        "actionneurs_interlock.cpp"
+    INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+    REQUIRES 
+        driver
+        esp_timer
+        gestion_mqtt
+        cjson
+        gestion_http
+)

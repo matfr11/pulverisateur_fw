@@ -1,0 +1,566 @@
+Command: ninja all
+[1/9] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\bootloader\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/esp/pulverisateur_fw/carte_relais/build/bootloader/bootloader.bin"
+Bootloader binary size 0x66c0 bytes. 0x940 bytes (8%) free.
+[2/9] No install step for 'bootloader'
+[3/9] Completed 'bootloader'
+[4/9] Building CXX object esp-idf/gestion_http/CMakeFiles/__idf_gestion_http.dir/http_handlers.cpp.obj
+FAILED: esp-idf/gestion_http/CMakeFiles/__idf_gestion_http.dir/http_handlers.cpp.obj 
+ccache C:\Users\destr\.espressif\tools\xtensa-esp-elf\esp-14.2.0_20251107\xtensa-esp-elf\bin\xtensa-esp32-elf-g++.exe -DBOARD_TYPE_ARRIERE -DESP_PLATFORM -DIDF_VER=\"v5.5.2\" -DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -IC:/esp/pulverisateur_fw/carte_relais/build/config -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_http -IC:/esp/pulverisateur_fw/commun/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/newlib/platform_include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/include/freertos -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/esp_additions/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include/soc -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include/soc/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/dma/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/ldo/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/debug_probe/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/mspi_timing_tuning/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/power_supply/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/port/esp32/. -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/port/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/heap/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/heap/tlsf -IC:/Users/destr/esp/v5.5.2/esp-idf/components/log/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32/register -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/platform_port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32/include/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_common/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/port/soc -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/port/include/private -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/deprecated_include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include/apps -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include/apps/sntp -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/lwip/src/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/freertos/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include/arch -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include/sys -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_http_server/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/http_parser -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_event/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/include/local -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/wifi_apps/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/wifi_apps/nan_app/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_phy/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_phy/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_netif/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/nvs_flash/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_partition/include -IC:/esp/pulverisateur_fw/carte_relais/managed_components/espressif__cjson/cJSON -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_mqtt -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_mqtt/include -IC:/esp/pulverisateur_fw/commun/gestion_mqtt -IC:/esp/pulverisateur_fw/carte_relais/main -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mqtt/esp-mqtt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/tcp_transport/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp-tls -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp-tls/esp-tls-crypto -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/library -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/esp_crt_bundle/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/everest/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m/p256-m -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_timer/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_actionneurs/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/deprecated -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/i2c/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/touch_sensor/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/twai/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/touch_sensor/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_pm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_ringbuf/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_gpio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_pcnt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_gptimer/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_spi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_mcpwm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_ana_cmpr/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_i2s/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdmmc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/sdmmc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdspi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_dac/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_rmt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_tsens/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_i2c/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_uart/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/vfs/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_ledc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_parlio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_usb_serial_jtag/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_twai/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_capteurs/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_configuration/include -mlongcalls -Wno-frame-address  -fno-builtin-memcpy -fno-builtin-memset -fno-builtin-bzero -fno-builtin-stpcpy -fno-builtin-strncpy -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Os -freorder-blocks -fmacro-prefix-map=C:/esp/pulverisateur_fw/carte_relais=. -fmacro-prefix-map=C:/Users/destr/esp/v5.5.2/esp-idf=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu++2b -fno-exceptions -fno-rtti -fuse-cxa-atexit -MD -MT esp-idf/gestion_http/CMakeFiles/__idf_gestion_http.dir/http_handlers.cpp.obj -MF esp-idf\gestion_http\CMakeFiles\__idf_gestion_http.dir\http_handlers.cpp.obj.d -o esp-idf/gestion_http/CMakeFiles/__idf_gestion_http.dir/http_handlers.cpp.obj -c C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:25:18: error: conflicting declaration of 'char* http_get_status_json()' with 'C' linkage
+   25 |     extern char* http_get_status_json(void);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:15:14: note: previous declaration with 'C++' linkage
+   15 | extern char* http_get_status_json(void);
+      |              ^~~~~~~~~~~~~~~~~~~~
+In file included from C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:7:
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: In function 'esp_err_t http_handler_root(httpd_req_t*)':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:14: error: 'TAG_HANDLERS' was not declared in this scope
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:5: note: in expansion of macro 'ESP_LOGI'
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:14: error: 'TAG_HANDLERS' was not declared in this scope
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:5: note: in expansion of macro 'ESP_LOGI'
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:14: error: 'TAG_HANDLERS' was not declared in this scope
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:5: note: in expansion of macro 'ESP_LOGI'
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:14: error: 'TAG_HANDLERS' was not declared in this scope
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:5: note: in expansion of macro 'ESP_LOGI'
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:14: error: 'TAG_HANDLERS' was not declared in this scope
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:35:5: note: in expansion of macro 'ESP_LOGI'
+   35 |     ESP_LOGI(TAG_HANDLERS, "GET /");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: In function 'esp_err_t http_handler_settings(httpd_req_t*)':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:14: error: 'TAG_HANDLERS' was not declared in this scope
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:5: note: in expansion of macro 'ESP_LOGI'
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:14: error: 'TAG_HANDLERS' was not declared in this scope
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:5: note: in expansion of macro 'ESP_LOGI'
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:14: error: 'TAG_HANDLERS' was not declared in this scope
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:5: note: in expansion of macro 'ESP_LOGI'
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:14: error: 'TAG_HANDLERS' was not declared in this scope
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:5: note: in expansion of macro 'ESP_LOGI'
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:14: error: 'TAG_HANDLERS' was not declared in this scope
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:48:5: note: in expansion of macro 'ESP_LOGI'
+   48 |     ESP_LOGI(TAG_HANDLERS, "GET /settings");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: In function 'esp_err_t http_handler_api_cmd(httpd_req_t*)':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:14: error: 'TAG_HANDLERS' was not declared in this scope
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:5: note: in expansion of macro 'ESP_LOGI'
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:14: error: 'TAG_HANDLERS' was not declared in this scope
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:5: note: in expansion of macro 'ESP_LOGI'
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:14: error: 'TAG_HANDLERS' was not declared in this scope
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:5: note: in expansion of macro 'ESP_LOGI'
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:14: error: 'TAG_HANDLERS' was not declared in this scope
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:5: note: in expansion of macro 'ESP_LOGI'
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:14: error: 'TAG_HANDLERS' was not declared in this scope
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:117:5: note: in expansion of macro 'ESP_LOGI'
+  117 |     ESP_LOGI(TAG_HANDLERS, "API CMD: type=%s action=%s", type, action);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:18: error: 'TAG_HANDLERS' was not declared in this scope
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:78:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   78 | #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:9: note: in expansion of macro 'ESP_LOGW'
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:18: error: 'TAG_HANDLERS' was not declared in this scope
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:78:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   78 | #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:9: note: in expansion of macro 'ESP_LOGW'
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:18: error: 'TAG_HANDLERS' was not declared in this scope
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:78:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   78 | #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:9: note: in expansion of macro 'ESP_LOGW'
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:18: error: 'TAG_HANDLERS' was not declared in this scope
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:78:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   78 | #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:9: note: in expansion of macro 'ESP_LOGW'
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:18: error: 'TAG_HANDLERS' was not declared in this scope
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:78:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   78 | #define ESP_LOGW(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_WARN, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:218:9: note: in expansion of macro 'ESP_LOGW'
+  218 |         ESP_LOGW(TAG_HANDLERS, "ARRÊT D'URGENCE demandé");
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: In function 'esp_err_t http_handler_api_save(httpd_req_t*)':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:14: error: 'TAG_HANDLERS' was not declared in this scope
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:5: note: in expansion of macro 'ESP_LOGI'
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:14: error: 'TAG_HANDLERS' was not declared in this scope
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:5: note: in expansion of macro 'ESP_LOGI'
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:14: error: 'TAG_HANDLERS' was not declared in this scope
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:5: note: in expansion of macro 'ESP_LOGI'
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:14: error: 'TAG_HANDLERS' was not declared in this scope
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:5: note: in expansion of macro 'ESP_LOGI'
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:14: error: 'TAG_HANDLERS' was not declared in this scope
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:230:5: note: in expansion of macro 'ESP_LOGI'
+  230 |     ESP_LOGI(TAG_HANDLERS, "API SAVE CONFIG");
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:18: error: 'TAG_HANDLERS' was not declared in this scope
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:9: note: in expansion of macro 'ESP_LOGI'
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:18: error: 'TAG_HANDLERS' was not declared in this scope
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:9: note: in expansion of macro 'ESP_LOGI'
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:18: error: 'TAG_HANDLERS' was not declared in this scope
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:9: note: in expansion of macro 'ESP_LOGI'
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:18: error: 'TAG_HANDLERS' was not declared in this scope
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:9: note: in expansion of macro 'ESP_LOGI'
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:18: error: 'TAG_HANDLERS' was not declared in this scope
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:239:9: note: in expansion of macro 'ESP_LOGI'
+  239 |         ESP_LOGI(TAG_HANDLERS, "  transfer_target = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:18: error: 'TAG_HANDLERS' was not declared in this scope
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:9: note: in expansion of macro 'ESP_LOGI'
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:18: error: 'TAG_HANDLERS' was not declared in this scope
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:9: note: in expansion of macro 'ESP_LOGI'
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:18: error: 'TAG_HANDLERS' was not declared in this scope
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:9: note: in expansion of macro 'ESP_LOGI'
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:18: error: 'TAG_HANDLERS' was not declared in this scope
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:9: note: in expansion of macro 'ESP_LOGI'
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:18: error: 'TAG_HANDLERS' was not declared in this scope
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:243:9: note: in expansion of macro 'ESP_LOGI'
+  243 |         ESP_LOGI(TAG_HANDLERS, "  k_factor = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:18: error: 'TAG_HANDLERS' was not declared in this scope
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:9: note: in expansion of macro 'ESP_LOGI'
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:18: error: 'TAG_HANDLERS' was not declared in this scope
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:9: note: in expansion of macro 'ESP_LOGI'
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:18: error: 'TAG_HANDLERS' was not declared in this scope
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:9: note: in expansion of macro 'ESP_LOGI'
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:18: error: 'TAG_HANDLERS' was not declared in this scope
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:9: note: in expansion of macro 'ESP_LOGI'
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:18: error: 'TAG_HANDLERS' was not declared in this scope
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |                  ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:247:9: note: in expansion of macro 'ESP_LOGI'
+  247 |         ESP_LOGI(TAG_HANDLERS, "  brass_time_on = %s", buf);
+      |         ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: In function 'esp_err_t http_handler_toggle(httpd_req_t*)':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:14: error: 'TAG_HANDLERS' was not declared in this scope
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:194:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  194 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:5: note: in expansion of macro 'ESP_LOGI'
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:14: error: 'TAG_HANDLERS' was not declared in this scope
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:195:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  195 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_WARN)    { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_WARN),    tag, LOG_FORMAT(W, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:5: note: in expansion of macro 'ESP_LOGI'
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:14: error: 'TAG_HANDLERS' was not declared in this scope
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:196:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  196 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_DEBUG)   { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_DEBUG),   tag, LOG_FORMAT(D, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:5: note: in expansion of macro 'ESP_LOGI'
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:14: error: 'TAG_HANDLERS' was not declared in this scope
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:197:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  197 |         else if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_VERBOSE) { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_VERBOSE), tag, LOG_FORMAT(V, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:5: note: in expansion of macro 'ESP_LOGI'
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:14: error: 'TAG_HANDLERS' was not declared in this scope
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |              ^~~~~~~~~~~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:198:111: note: in definition of macro 'ESP_LOG_LEVEL'
+  198 |         else                                                  { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_INFO),    tag, LOG_FORMAT(I, format), esp_log_timestamp(), tag __VA_OPT__(,) __VA_ARGS__); } \
+      |                                                                                                               ^~~
+C:/Users/destr/esp/v5.5.2/esp-idf/components/log/include/esp_log.h:79:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+   79 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format __VA_OPT__(,) __VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:263:5: note: in expansion of macro 'ESP_LOGI'
+  263 |     ESP_LOGI(TAG_HANDLERS, "TOGGLE: %s", type);
+      |     ^~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp: At global scope:
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/http_handlers.cpp:16:20: warning: 'TAG_HANDLERS_HANDLERS' defined but not used [-Wunused-variable]
+   16 | static const char* TAG_HANDLERS_HANDLERS = "HTTP_HANDLERS";
+      |                    ^~~~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

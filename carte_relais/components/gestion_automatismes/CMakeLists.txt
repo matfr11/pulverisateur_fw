@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS 
+        "automatismes_manager.cpp"
+        "transfert.cpp"
+        "brassage.cpp"
+        "automatismes_mqtt.cpp"
+    INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+        PRIV_REQUIRES 
+        main
+    REQUIRES 
+        esp_timer
+        gestion_mqtt
+        gestion_actionneurs
+        gestion_capteurs
+        cjson
+)

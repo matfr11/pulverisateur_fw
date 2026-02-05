@@ -1,0 +1,2 @@
+source C:/esp/pulverisateur_fw/carte_relais/build/bootloader/gdbinit/symbols
+source C:/esp/pulverisateur_fw/carte_relais/build/bootloader/gdbinit/connect

@@ -1,0 +1,18 @@
+idf_component_register(
+    SRCS 
+        "capteurs_manager.cpp"
+        "debitmetre.cpp"
+        "capteurs_mqtt.cpp"
+    INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+        PRIV_REQUIRES 
+        main
+    REQUIRES 
+        driver
+        esp_timer
+        gestion_mqtt
+        gestion_configuration
+        cjson
+)

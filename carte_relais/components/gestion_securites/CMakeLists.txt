@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS 
+        "securites_manager.cpp"
+        "detection_cuve_vide.cpp"
+            INCLUDE_DIRS 
+        "include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/include"
+        "${CMAKE_CURRENT_LIST_DIR}/../../../commun/gestion_mqtt"
+        PRIV_REQUIRES 
+        main
+    REQUIRES 
+        esp_timer
+        gestion_mqtt
+        gestion_capteurs
+        gestion_automatismes
+        gestion_actionneurs 
+        cjson
+        json
+)

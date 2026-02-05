@@ -1,0 +1,20 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe -DESP_PLATFORM=1 -DBOARD_TYPE=ARRIERE -DCCACHE_ENABLE=1 C:\esp\pulverisateur_fw\carte_relais
+CMake Error at C:/Users/destr/esp/v5.5.2/esp-idf/tools/cmake/component.cmake:492 (add_library):
+  Cannot find source file:
+
+    C:/esp/pulverisateur_fw/carte_relais/components/gestion_http/ui_pages.cpp
+
+  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .mpp .m .M .mm .ixx .cppm
+  .ccm .cxxm .c++m .h .hh .h++ .hm .hpp .hxx .in .txx .f .F .for .f77 .f90
+  .f95 .f03 .hip .ispc
+Call Stack (most recent call first):
+  components/gestion_http/CMakeLists.txt:1 (idf_component_register)
+
+
+CMake Error at C:/Users/destr/esp/v5.5.2/esp-idf/tools/cmake/component.cmake:492 (add_library):
+  No SOURCES given to target: __idf_gestion_http
+Call Stack (most recent call first):
+  components/gestion_http/CMakeLists.txt:1 (idf_component_register)
+
+
+CMake Generate step failed.  Build files cannot be regenerated correctly.
