@@ -27,6 +27,11 @@ extern "C" {
 esp_err_t wifi_initialiser(role_reseau_t *role_out);
 
 /**
+ * @brief demande de failover.
+ */
+bool wifi_failover_est_demande(void);
+
+/**
  * @brief Retourne le rôle réseau actuel.
  */
 role_reseau_t wifi_obtenir_role(void);

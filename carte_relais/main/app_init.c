@@ -39,7 +39,7 @@ static configuration_t      s_config = CONFIG_DEFAUT;
 static uint32_t             s_compteur_publication = 0;
 
 /* Intervalle de publication d'état (en ticks de la tâche à 100ms) */
-#define INTERVALLE_PUBLICATION  10  /* = 1 seconde */
+#define INTERVALLE_PUBLICATION  3  /* = 1 seconde */
 
 /* ====================================================================
  * CALLBACKS MQTT
@@ -305,6 +305,27 @@ void app_tache_principale(void *pvParameters)
 #endif
 
         /* --- Publication MQTT périodique --- */
+        /* --- Failover WiFi (exécuté dans la tâche principale, pas le timer) --- */
+        if (wifi_failover_est_demande()) {
+            wifi_failover_vers_master();
+
+            /* Arrêter l'ancien client MQTT (connecté à l'ancien master) */
+            /* Démarrer le broker si pas encore actif */
+            if (!broker_mqtt_est_actif()) {
+                broker_mqtt_config_t broker_cfg = { .port = 1883 };
+                broker_mqtt_demarrer(&broker_cfg);
+                vTaskDelay(pdMS_TO_TICKS(500));
+            }
+            s_role = ROLE_MASTER;
+#if A_WEB_UI
+            mqtt_enregistrer_callback_etat(on_etat_recu);
+#endif
+            mqtt_initialiser(MQTT_BROKER_URI_MASTER, ID_CARTE);
+#if A_WEB_UI
+            web_ui_demarrer(&s_config);
+            ESP_LOGI(TAG, "Web UI démarrée après failover.");
+#endif
+        }
         s_compteur_publication++;
         if (s_compteur_publication >= INTERVALLE_PUBLICATION) {
             s_compteur_publication = 0;

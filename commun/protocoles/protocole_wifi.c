@@ -35,6 +35,7 @@ static esp_netif_t         *s_netif_sta = NULL;
 
 static int s_nb_tentatives_reconnexion = 0;
 static bool s_en_scan = false; 
+static volatile bool s_failover_demande = false; 
 
 #define MAX_TENTATIVES_RECONNEXION  5
 
@@ -252,13 +253,17 @@ static esp_err_t wifi_demarrer_sta(void)
  * ==================================================================== */
 static void timer_failover_cb(TimerHandle_t timer)
 {
-    ESP_LOGW(TAG, "Timer failover expiré ! Bascule vers MASTER.");
-    wifi_failover_vers_master();
+    ESP_LOGW(TAG, "Timer failover expiré ! Failover demandé.");
+    s_failover_demande = true;
 }
-
 /* ====================================================================
  * FONCTIONS PUBLIQUES
  * ==================================================================== */
+bool wifi_failover_est_demande(void)
+{
+    return s_failover_demande;
+}
+
 esp_err_t wifi_initialiser(role_reseau_t *role_out)
 {
     /* Initialisation NVS (nécessaire pour WiFi) */
@@ -319,14 +324,31 @@ esp_err_t wifi_failover_vers_master(void)
 {
     ESP_LOGW(TAG, "=== FAILOVER : SLAVE → MASTER ===");
 
-    /* Arrêter le mode STA */
+    /* Juste déconnecter et stopper, PAS deinit */
+    s_failover_demande = false;
     esp_wifi_disconnect();
     esp_wifi_stop();
-    esp_wifi_deinit();
 
-    s_connecte = false;
+    /* Reconfigurer en AP sans détruire le driver */
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+
+    wifi_config_t ap_config = {
+        .ap = {
+            .ssid = WIFI_SSID_AP,
+            .password = WIFI_PASS_AP,
+            .ssid_len = strlen(WIFI_SSID_AP),
+            .channel = WIFI_CHANNEL_AP,
+            .authmode = WIFI_AUTH_WPA2_PSK,
+            .max_connection = WIFI_MAX_CONN_AP,
+        },
+    };
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
+    ESP_ERROR_CHECK(esp_wifi_start());
+
+    s_role = ROLE_MASTER;
+    s_connecte = true;
     s_nb_tentatives_reconnexion = 0;
 
-    /* Redémarrer en mode AP */
-    return wifi_demarrer_ap();
+    ESP_LOGI(TAG, "Failover terminé : AP actif.");
+    return ESP_OK;
 }

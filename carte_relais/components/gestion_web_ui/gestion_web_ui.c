@@ -229,7 +229,7 @@ static const char PAGE_PART2[] =
 "    document.getElementById('status-tag').innerText='LIAISON PERDUE';"
 "  });"
 "}"
-"setInterval(refresh,1000);"
+"setInterval(refresh,300);"
 "</script></body></html>";
 
 /* ====================================================================
