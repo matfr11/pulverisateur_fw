@@ -196,6 +196,12 @@ void app_initialiser(void)
     /* 3. Initialiser les capteurs */
     capteurs_initialiser();
 
+    #ifdef CARTE_ARRIERE
+    /* Laisser la priorité à la carte AVANT pour devenir MASTER */
+    ESP_LOGI(TAG, "Carte ARRIÈRE : attente 4s avant scan réseau...");
+    vTaskDelay(pdMS_TO_TICKS(4000));
+    #endif
+
     /* 4. Démarrer WiFi et déterminer le rôle */
     wifi_initialiser(&s_role);
     ESP_LOGI(TAG, "Rôle réseau : %s", s_role == ROLE_MASTER ? "MASTER" : "SLAVE");

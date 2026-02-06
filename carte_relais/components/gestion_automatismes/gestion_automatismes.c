@@ -250,18 +250,21 @@ void automatismes_update(float debit_lpm, float volume_session)
  * ==================================================================== */
 void automatismes_arreter_tout(void)
 {
+    if (s_transfert.etat == AUTO_TR_INACTIF && s_brassage.etat == AUTO_BR_INACTIF) {
+        return;
+    }
     ESP_LOGW(TAG, "Arrêt de tous les automatismes.");
 
+    /* Ne couper les actionneurs que si un automatisme les pilotait */
     if (s_transfert.etat == AUTO_TR_EN_COURS) {
-        s_transfert.etat = AUTO_TR_INACTIF;
-    }
-    if (s_brassage.etat != AUTO_BR_INACTIF) {
-        s_brassage.etat = AUTO_BR_INACTIF;
+        actionneurs_pompe_set(false);
+        actionneurs_v3v_set(V3V_BRASSAGE);
+    } else if (s_brassage.etat == AUTO_BR_MARCHE) {
+        actionneurs_pompe_set(false);
     }
 
-    /* Couper pompe et remettre vanne en brassage */
-    actionneurs_pompe_set(false);
-    actionneurs_v3v_set(V3V_BRASSAGE);
+    s_transfert.etat = AUTO_TR_INACTIF;
+    s_brassage.etat = AUTO_BR_INACTIF;
 }
 
 #else
