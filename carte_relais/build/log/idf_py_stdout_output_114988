@@ -1,0 +1,26 @@
+Command: ninja all
+[1/17] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\bootloader\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/esp/pulverisateur_fw/carte_relais/build/bootloader/bootloader.bin"
+Bootloader binary size 0x66c0 bytes. 0x940 bytes (8%) free.
+[2/17] Building C object esp-idf/gestion_securites/CMakeFiles/__idf_gestion_securites.dir/gestion_securites.c.obj
+[3/17] No install step for 'bootloader'
+[4/17] Building C object esp-idf/gestion_automatismes/CMakeFiles/__idf_gestion_automatismes.dir/gestion_automatismes.c.obj
+[5/17] Building C object esp-idf/gestion_capteurs/CMakeFiles/__idf_gestion_capteurs.dir/gestion_capteurs.c.obj
+[6/17] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_init.c.obj
+[7/17] Linking C static library esp-idf\gestion_securites\libgestion_securites.a
+[8/17] Completed 'bootloader'
+[9/17] Linking C static library esp-idf\gestion_capteurs\libgestion_capteurs.a
+[10/17] Building C object esp-idf/gestion_actionneurs/CMakeFiles/__idf_gestion_actionneurs.dir/gestion_actionneurs.c.obj
+[11/17] Linking C static library esp-idf\gestion_actionneurs\libgestion_actionneurs.a
+[12/17] Linking C static library esp-idf\gestion_automatismes\libgestion_automatismes.a
+[13/17] Linking C static library esp-idf\main\libmain.a
+[14/17] Generating esp-idf/esp_system/ld/sections.ld
+[15/17] Linking CXX executable carte_relais.elf
+[16/17] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+Generated C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin
+[17/17] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/esp/pulverisateur_fw/carte_relais/build/partition_table/partition-table.bin C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin"
+carte_relais.bin binary size 0xeb810 bytes. Smallest app partition is 0x1e0000 bytes. 0xf47f0 bytes (51%) free.

@@ -1,0 +1,58 @@
+Command: ninja all
+[1/49] Building C object esp-idf/perfmon/CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_masks.c.obj
+[2/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs/src/spiffs_cache.c.obj
+[3/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs/src/spiffs_gc.c.obj
+[4/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs/src/spiffs_check.c.obj
+[5/49] Building C object esp-idf/rt/CMakeFiles/__idf_rt.dir/FreeRTOS_POSIX_utils.c.obj
+[6/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs_api.c.obj
+[7/49] Building C object esp-idf/rt/CMakeFiles/__idf_rt.dir/FreeRTOS_POSIX_mqueue.c.obj
+[8/49] Building C object esp-idf/gestion_web_ui/CMakeFiles/__idf_gestion_web_ui.dir/gestion_web_ui.c.obj
+[9/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs/src/spiffs_nucleus.c.obj
+[10/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/spiffs/src/spiffs_hydrogen.c.obj
+[11/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/wifi_ctrl.c.obj
+[12/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/wifi_config.c.obj
+[13/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/wifi_scan.c.obj
+[14/49] Building C object esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/esp_spiffs.c.obj
+[15/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/manager.c.obj
+[16/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/proto-c/wifi_scan.pb-c.c.obj
+[17/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/handlers.c.obj
+[18/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/proto-c/wifi_ctrl.pb-c.c.obj
+[19/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/scheme_console.c.obj
+[20/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/proto-c/wifi_constants.pb-c.c.obj
+[21/49] Linking C static library esp-idf\gestion_web_ui\libgestion_web_ui.a
+[22/49] Linking C static library esp-idf\cmock\libcmock.a
+[23/49] Linking C static library esp-idf\app_trace\libapp_trace.a
+[24/49] Linking C static library esp-idf\esp_driver_cam\libesp_driver_cam.a
+[25/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/scheme_softap.c.obj
+[26/49] Building C object esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/proto-c/wifi_config.pb-c.c.obj
+[27/49] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj
+[28/49] Linking C static library esp-idf\esp_driver_touch_sens\libesp_driver_touch_sens.a
+[29/49] Linking C static library esp-idf\esp_hid\libesp_hid.a
+[30/49] Linking C static library esp-idf\esp_lcd\libesp_lcd.a
+[31/49] Linking C static library esp-idf\esp_local_ctrl\libesp_local_ctrl.a
+[32/49] Linking C static library esp-idf\espcoredump\libespcoredump.a
+[33/49] Linking C static library esp-idf\esp_eth\libesp_eth.a
+[34/49] Linking C static library esp-idf\fatfs\libfatfs.a
+[35/49] Linking C static library esp-idf\nvs_sec_provider\libnvs_sec_provider.a
+[36/49] Linking C static library esp-idf\perfmon\libperfmon.a
+[37/49] Linking C static library esp-idf\rt\librt.a
+[38/49] Linking C static library esp-idf\spiffs\libspiffs.a
+[39/49] Linking C static library esp-idf\wifi_provisioning\libwifi_provisioning.a
+[40/49] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\bootloader\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/esp/pulverisateur_fw/carte_relais/build/bootloader/bootloader.bin"
+Bootloader binary size 0x66c0 bytes. 0x940 bytes (8%) free.
+[41/49] No install step for 'bootloader'
+[42/49] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_init.c.obj
+[43/49] Completed 'bootloader'
+[44/49] Linking C static library esp-idf\main\libmain.a
+[45/49] Generating esp-idf/esp_system/ld/sections.ld
+[46/49] Building C object CMakeFiles/carte_relais.elf.dir/project_elf_src_esp32.c.obj
+[47/49] Linking CXX executable carte_relais.elf
+[48/49] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+Generated C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin
+[49/49] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/esp/pulverisateur_fw/carte_relais/build/partition_table/partition-table.bin C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin"
+carte_relais.bin binary size 0xea200 bytes. Smallest app partition is 0x1e0000 bytes. 0xf5e00 bytes (51%) free.

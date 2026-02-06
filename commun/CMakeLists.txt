@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS 
+        "protocoles/protocole_wifi.c"
+        "protocoles/protocole_mqtt.c"
+        "broker_mqtt/broker_mqtt.c"
+    INCLUDE_DIRS 
+        "include"
+        "protocoles"
+        "broker_mqtt"
+    REQUIRES 
+        esp_wifi 
+        esp_netif 
+        nvs_flash 
+        mqtt 
+        json
+        esp_event
+        lwip
+        esp_timer
+)

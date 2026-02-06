@@ -1,0 +1,15 @@
+idf_component_register(
+    SRCS 
+        "app_main.c"
+        "app_init.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        commun
+        gestion_actionneurs
+        gestion_capteurs
+        gestion_automatismes
+        gestion_securites
+        gestion_configuration
+        gestion_web_ui
+)

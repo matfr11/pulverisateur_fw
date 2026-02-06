@@ -1,0 +1,196 @@
+Command: ninja all
+[1/137] Linking C static library esp-idf\protobuf-c\libprotobuf-c.a
+[2/137] Linking C static library esp-idf\json\libjson.a
+[3/137] Linking C static library esp-idf\mqtt\libmqtt.a
+[4/137] Linking C static library esp-idf\console\libconsole.a
+[5/137] Linking C static library esp-idf\commun\libcommun.a
+[6/137] Building C object esp-idf/gestion_automatismes/CMakeFiles/__idf_gestion_automatismes.dir/gestion_automatismes.c.obj
+[7/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/transports/protocomm_httpd.c.obj
+[8/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/security/security0.c.obj
+[9/137] Linking C static library esp-idf\gestion_actionneurs\libgestion_actionneurs.a
+[10/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/security/security1.c.obj
+[11/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/crypto/srp6a/esp_srp.c.obj
+[12/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/security/security2.c.obj
+[13/137] Building C object esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/src/crypto/srp6a/esp_srp_mpi.c.obj
+[14/137] Linking C static library esp-idf\gestion_capteurs\libgestion_capteurs.a
+[15/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/Partition.cpp.obj
+[16/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/WL_Ext_Safe.cpp.obj
+[17/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/SPI_Flash.cpp.obj
+[18/137] Linking C static library esp-idf\gestion_automatismes\libgestion_automatismes.a
+[19/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/crc32.cpp.obj
+[20/137] Linking C static library esp-idf\gestion_securites\libgestion_securites.a
+[21/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/WL_Ext_Perf.cpp.obj
+[22/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/WL_Flash.cpp.obj
+[23/137] Linking C static library esp-idf\gestion_configuration\libgestion_configuration.a
+[24/137] Building CXX object esp-idf/wear_levelling/CMakeFiles/__idf_wear_levelling.dir/wear_levelling.cpp.obj
+[25/137] Linking C static library esp-idf\unity\libunity.a
+[26/137] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/app_trace_util.c.obj
+[27/137] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/app_trace.c.obj
+[28/137] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/host_file_io.c.obj
+[29/137] Building C object esp-idf/cmock/CMakeFiles/__idf_cmock.dir/CMock/src/cmock.c.obj
+[30/137] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/esp_cam_ctlr.c.obj
+[31/137] Building C object esp-idf/gestion_web_ui/CMakeFiles/__idf_gestion_web_ui.dir/gestion_web_ui.c.obj
+FAILED: esp-idf/gestion_web_ui/CMakeFiles/__idf_gestion_web_ui.dir/gestion_web_ui.c.obj 
+ccache C:\Users\destr\.espressif\tools\xtensa-esp-elf\esp-14.2.0_20251107\xtensa-esp-elf\bin\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DIDF_VER=\"v5.5.2\" -DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -IC:/esp/pulverisateur_fw/carte_relais/build/config -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/include -IC:/esp/pulverisateur_fw/carte_relais/main -IC:/Users/destr/esp/v5.5.2/esp-idf/components/newlib/platform_include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/include/freertos -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/config/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Users/destr/esp/v5.5.2/esp-idf/components/freertos/esp_additions/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include/soc -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/include/soc/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/dma/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/ldo/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/debug_probe/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/mspi_timing_tuning/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/power_supply/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/port/esp32/. -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_hw_support/port/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/heap/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/heap/tlsf -IC:/Users/destr/esp/v5.5.2/esp-idf/components/log/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/soc/esp32/register -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/platform_port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/hal/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32/include/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_rom/esp32 -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_common/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/port/soc -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_system/port/include/private -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/xtensa/deprecated_include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include/apps -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/include/apps/sntp -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/lwip/src/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/freertos/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include/arch -IC:/Users/destr/esp/v5.5.2/esp-idf/components/lwip/port/esp32xx/include/sys -IC:/esp/pulverisateur_fw/commun/include -IC:/esp/pulverisateur_fw/commun/protocoles -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/include/local -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/wifi_apps/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_wifi/wifi_apps/nan_app/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_event/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_phy/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_phy/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_netif/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/nvs_flash/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_partition/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mqtt/esp-mqtt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/tcp_transport/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp-tls -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp-tls/esp-tls-crypto -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/port/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/library -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/esp_crt_bundle/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/everest/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m -IC:/Users/destr/esp/v5.5.2/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m/p256-m -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_timer/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/json/cJSON -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_actionneurs/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/deprecated -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/i2c/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/touch_sensor/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/twai/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/driver/touch_sensor/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_pm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_ringbuf/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_gpio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_pcnt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_gptimer/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_spi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_mcpwm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_ana_cmpr/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_i2s/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdmmc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/sdmmc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdspi/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_dac/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_rmt/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_tsens/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_sdm/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_i2c/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_uart/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/vfs/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_ledc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_parlio/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_usb_serial_jtag/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_driver_twai/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_capteurs/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_adc/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_adc/interface -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_adc/esp32/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_adc/deprecated/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_automatismes/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_securites/include -IC:/esp/pulverisateur_fw/carte_relais/components/gestion_configuration/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/esp_http_server/include -IC:/Users/destr/esp/v5.5.2/esp-idf/components/http_parser -mlongcalls -Wno-frame-address  -fno-builtin-memcpy -fno-builtin-memset -fno-builtin-bzero -fno-builtin-stpcpy -fno-builtin-strncpy -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fno-shrink-wrap -fmacro-prefix-map=C:/esp/pulverisateur_fw/carte_relais=. -fmacro-prefix-map=C:/Users/destr/esp/v5.5.2/esp-idf=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu17 -Wno-old-style-declaration -MD -MT esp-idf/gestion_web_ui/CMakeFiles/__idf_gestion_web_ui.dir/gestion_web_ui.c.obj -MF esp-idf\gestion_web_ui\CMakeFiles\__idf_gestion_web_ui.dir\gestion_web_ui.c.obj.d -o esp-idf/gestion_web_ui/CMakeFiles/__idf_gestion_web_ui.dir/gestion_web_ui.c.obj -c C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c: In function 'handler_page_principale':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:245:36: error: unknown conversion type character ';' in format [-Werror=format=]
+  245 |     int len = snprintf(page, 8192, PAGE_PRINCIPALE, CSS_COMMUN);
+      |                                    ^~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:245:36: error: unknown conversion type character ';' in format [-Werror=format=]
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:245:36: error: unknown conversion type character ';' in format [-Werror=format=]
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:245:36: error: unknown conversion type character ';' in format [-Werror=format=]
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c: In function 'handler_page_settings':
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:331:9: error: ''></div><div class='setting-...' directive output truncated writing 108 bytes into a region of size between 54 and 63 [-Werror=format-truncation=]
+  331 |         "<!DOCTYPE html><html><head><meta charset='UTF-8'>"
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:353:16: note: format string is defined here
+  351 |         "<input type='number' id='t_tgt' value='%u'></div>"
+      |                                                   ~~~~~~~~~
+  352 |         "<div class='setting-row'><label>Facteur K</label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  353 |         "<input type='number' step='0.1' id='k_fact' value='%.1f'></div></div>"
+      |         ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/esp/pulverisateur_fw/carte_relais/components/gestion_web_ui/gestion_web_ui.c:330:15: note: 'snprintf' output between 5736 and 6399 bytes into a destination of size 4096
+  330 |     int len = snprintf(page, 4096,
+      |               ^~~~~~~~~~~~~~~~~~~~
+  331 |         "<!DOCTYPE html><html><head><meta charset='UTF-8'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  332 |         "<meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  333 |         "%s"
+      |         ~~~~   
+  334 |         "<style>"
+      |         ~~~~~~~~~
+  335 |         ".setting-row{display:flex;align-items:center;justify-content:space-between;"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  336 |         "padding:12px 0;border-bottom:1px solid #333}"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  337 |         "input[type='number']{background:#121212;border:1px solid #444;color:white;"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  338 |         "padding:8px;border-radius:5px;width:90px;text-align:center;font-size:1rem}"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  339 |         "label{font-size:.95rem;color:#ccc}"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  340 |         ".unit{font-size:.75rem;color:#666;margin-left:5px}"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  341 |         "h2{color:#39f;font-size:1.1rem;margin-top:20px;border-left:3px solid #39f;"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  342 |         "padding-left:10px;border-bottom:none;text-align:left}"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  343 |         "</style></head><body>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~
+  344 |         "<div class='top-bar'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~
+  345 |         "<a href='/' style='color:#39f;text-decoration:none;font-weight:bold'>&#9664; RETOUR</a>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  346 |         "<div class='ver-info'>CONFIG v3.0.0</div><div></div></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |         "<div style='padding:15px;overflow-y:auto;flex:1'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |         "<h2>TRANSFERT AUTOMATIQUE</h2>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  349 |         "<div class='control-card'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  350 |         "<div class='setting-row'><label>Volume <span class='unit'>(L)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  351 |         "<input type='number' id='t_tgt' value='%u'></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  352 |         "<div class='setting-row'><label>Facteur K</label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  353 |         "<input type='number' step='0.1' id='k_fact' value='%.1f'></div></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  354 |         "<h2>S&Eacute;CURIT&Eacute; D&Eacute;BIT</h2>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  355 |         "<div class='control-card'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  356 |         "<div class='setting-row'><label>Seuil mini <span class='unit'>(L/min)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  357 |         "<input type='number' step='0.1' id='e_flow' value='%.1f'></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  358 |         "<div class='setting-row'><label>D&eacute;lai <span class='unit'>(ms)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  359 |         "<input type='number' id='e_out' value='%u'></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  360 |         "<div class='setting-row'><label>Timeout Vannes <span class='unit'>(ms)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  361 |         "<input type='number' id='v_timeout' value='%u'></div></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  362 |         "<h2>CYCLES DE BRASSAGE</h2>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  363 |         "<div class='control-card'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  364 |         "<div class='setting-row'><label>Marche <span class='unit'>(sec)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  365 |         "<input type='number' id='br_on' value='%u'></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  366 |         "<div class='setting-row'><label>Repos <span class='unit'>(sec)</span></label>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  367 |         "<input type='number' id='br_off' value='%u'></div></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  368 |         "<br><button class='btn-full active-green' onclick='saveSettings()'>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  369 |         "ENREGISTRER</button></div>"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  370 |         "<script>"
+      |         ~~~~~~~~~~
+  371 |         "function saveSettings(){"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  372 |         "  var cfg={"
+      |         ~~~~~~~~~~~~~
+  373 |         "    volume_transfert:+document.getElementById('t_tgt').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  374 |         "    facteur_k:+document.getElementById('k_fact').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  375 |         "    seuil_debit:+document.getElementById('e_flow').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  376 |         "    delai_detection:+document.getElementById('e_out').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  377 |         "    timeout_vanne:+document.getElementById('v_timeout').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  378 |         "    temps_on:+document.getElementById('br_on').value,"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  379 |         "    temps_off:+document.getElementById('br_off').value"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  380 |         "  };"
+      |         ~~~~~~ 
+  381 |         "  fetch('/api/save_config',{method:'POST',"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  382 |         "    headers:{'Content-Type':'application/json'},"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  383 |         "    body:JSON.stringify(cfg)"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  384 |         "  }).then(r=>{if(r.ok)alert('OK');else alert('Erreur');})"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  385 |         "    .catch(e=>alert('Erreur: '+e));"
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  386 |         "}"
+      |         ~~~    
+  387 |         "</script></body></html>",
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  388 |         CSS_COMMUN,
+      |         ~~~~~~~~~~~
+  389 |         (unsigned)s_config_courante.volume_transfert,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  390 |         s_config_courante.facteur_k_debitmetre,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  391 |         s_config_courante.seuil_debit_cuve_vide,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  392 |         (unsigned)s_config_courante.delai_detection_ms,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  393 |         (unsigned)s_config_courante.timeout_vanne_ms,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  394 |         (unsigned)s_config_courante.temps_brassage_on,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  395 |         (unsigned)s_config_courante.temps_brassage_off
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  396 |     );
+      |     ~          
+cc1.exe: some warnings being treated as errors
+[32/137] Building C object esp-idf/app_trace/CMakeFiles/__idf_app_trace.dir/port/port_uart.c.obj
+[33/137] Building C object esp-idf/esp_driver_cam/CMakeFiles/__idf_esp_driver_cam.dir/dvp_share_ctrl.c.obj
+[34/137] Building C object esp-idf/esp_driver_touch_sens/CMakeFiles/__idf_esp_driver_touch_sens.dir/common/touch_sens_common.c.obj
+[35/137] Building C object esp-idf/esp_eth/CMakeFiles/__idf_esp_eth.dir/src/esp_eth.c.obj
+[36/137] Building C object esp-idf/esp_eth/CMakeFiles/__idf_esp_eth.dir/src/esp_eth_netif_glue.c.obj
+[37/137] Building C object esp-idf/esp_eth/CMakeFiles/__idf_esp_eth.dir/src/phy/esp_eth_phy_802_3.c.obj
+[38/137] Building C object esp-idf/esp_driver_touch_sens/CMakeFiles/__idf_esp_driver_touch_sens.dir/hw_ver1/touch_version_specific.c.obj
+ninja: build stopped: subcommand failed.
