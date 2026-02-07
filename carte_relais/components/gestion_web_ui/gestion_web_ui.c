@@ -24,6 +24,8 @@
 #include "mqtt_topics.h"
 #include "gestion_configuration.h"
 #include "esp_timer.h"
+#include "esp_ota_ops.h"
+#include "esp_partition.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -409,9 +411,47 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "<input type='number' id='s_hmax' value='%u'></div>"
         "<div class='setting-row'><label>Offset sonde <span class='unit'>(mm)</span></label>"
         "<input type='number' id='s_off' value='%u'></div></div>"
+        "<h2>MISE &Agrave; JOUR FIRMWARE</h2>"
+        "<div class='control-card'>"
+        "<div class='setting-row'>"
+        "<label>Fichier .bin</label>"
+        "<input type='file' id='ota_file' accept='.bin' style='color:#ccc;font-size:0.85rem'>"
+        "</div>"
+        "<div id='ota_progress' style='display:none;margin:8px 0'>"
+        "<div class='h-gauge-container'>"
+        "<div id='jFillOta' class='h-gauge-fill' style='background:#f39c12'></div>"
+        "<div id='jTextOta' class='h-gauge-text'>0%%</div>"
+        "</div></div>"
+        "<button class='btn-full' style='background:#663300;color:#ffaa00;border:1px solid #885500'"
+        " onclick='doOta()'>FLASHER LE FIRMWARE</button>"
+        "</div>"
         "<br><button class='btn-full active-green' onclick='saveSettings()'>"
         "ENREGISTRER</button></div>"
         "<script>"
+        "function doOta(){"
+        "  var f=document.getElementById('ota_file').files[0];"
+        "  if(!f){alert('Choisir un fichier .bin');return;}"
+        "  if(!confirm('Flasher '+f.name+' ('+Math.round(f.size/1024)+' KB) ?\\nLa carte va redémarrer.')){return;}"
+        "  var pg=document.getElementById('ota_progress');pg.style.display='block';"
+        "  var xhr=new XMLHttpRequest();"
+        "  xhr.open('POST','/api/ota');"
+        "  xhr.upload.onprogress=function(e){"
+        "    if(e.lengthComputable){"
+        "      var p=Math.round(e.loaded/e.total*100);"
+        "      document.getElementById('jFillOta').style.width=p+'%%';"
+        "      document.getElementById('jTextOta').innerText=p+'%%';"
+        "    }"
+        "  };"
+        "  xhr.onload=function(){"
+        "    if(xhr.status==200){"
+        "      document.getElementById('jTextOta').innerText='OK - Redemarrage...';"
+        "      document.getElementById('jFillOta').style.background='#2ecc71';"
+        "      document.getElementById('jFillOta').style.width='100%%';"
+        "    }else{alert('Erreur OTA: '+xhr.responseText);}"
+        "  };"
+        "  xhr.onerror=function(){alert('Erreur réseau');};"
+        "  xhr.send(f);"
+        "}"
         "function saveSettings(){"
         "  var cfg={"
         "    volume_transfert:+document.getElementById('t_tgt').value,"
@@ -505,6 +545,91 @@ static esp_err_t handler_save_config(httpd_req_t *req)
     ESP_LOGI(TAG, "Configuration mise à jour (v%lu)", (unsigned long)s_config_courante.version);
     return ESP_OK;
 }
+/* ====================================================================
+ * mises a jour ots
+ * ==================================================================== */
+
+ /** POST /api/ota → Réception du firmware et flash OTA */
+static esp_err_t handler_ota(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "OTA : réception firmware (%d octets)...", req->content_len);
+
+    const esp_partition_t *update = esp_ota_get_next_update_partition(NULL);
+    if (!update) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Pas de partition OTA");
+        return ESP_FAIL;
+    }
+
+    esp_ota_handle_t ota_handle;
+    esp_err_t err = esp_ota_begin(update, OTA_SIZE_UNKNOWN, &ota_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "esp_ota_begin failed: %s", esp_err_to_name(err));
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "OTA begin failed");
+        return ESP_FAIL;
+    }
+
+    char *buf = malloc(4096);
+    if (!buf) {
+        esp_ota_abort(ota_handle);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Malloc failed");
+        return ESP_FAIL;
+    }
+
+    int remaining = req->content_len;
+    int received_total = 0;
+
+    while (remaining > 0) {
+        int received = httpd_req_recv(req, buf, (remaining < 4096) ? remaining : 4096);
+        if (received <= 0) {
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) continue;
+            ESP_LOGE(TAG, "OTA : erreur réception");
+            free(buf);
+            esp_ota_abort(ota_handle);
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Recv error");
+            return ESP_FAIL;
+        }
+
+        err = esp_ota_write(ota_handle, buf, received);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "OTA : erreur écriture");
+            free(buf);
+            esp_ota_abort(ota_handle);
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Write error");
+            return ESP_FAIL;
+        }
+
+        remaining -= received;
+        received_total += received;
+
+        if (received_total % 65536 < 4096) {
+            ESP_LOGI(TAG, "OTA : %d / %d octets", received_total, req->content_len);
+        }
+    }
+
+    free(buf);
+
+    err = esp_ota_end(ota_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "OTA : validation échouée: %s", esp_err_to_name(err));
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "OTA end failed");
+        return ESP_FAIL;
+    }
+
+    err = esp_ota_set_boot_partition(update);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "OTA : set boot partition failed");
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Set boot failed");
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "OTA OK ! Redémarrage dans 2s...");
+    httpd_resp_send(req, "OK", 2);
+
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    esp_restart();
+
+    return ESP_OK;  /* jamais atteint */
+}
 
 /* ====================================================================
  * DÉMARRAGE / ARRÊT DU SERVEUR
@@ -516,7 +641,7 @@ void web_ui_demarrer(const configuration_t *config)
     }
 
     httpd_config_t http_config = HTTPD_DEFAULT_CONFIG();
-    http_config.max_uri_handlers = 10;
+    http_config.max_uri_handlers = 12;
     http_config.stack_size = 8192;
 
     if (httpd_start(&s_serveur, &http_config) != ESP_OK) {
@@ -535,12 +660,14 @@ void web_ui_demarrer(const configuration_t *config)
                                   .handler = handler_page_settings };
     httpd_uri_t uri_save = { .uri = "/api/save_config", .method = HTTP_POST,
                               .handler = handler_save_config };
-
+    httpd_uri_t uri_ota = { .uri = "/api/ota", .method = HTTP_POST,
+                            .handler = handler_ota };
     httpd_register_uri_handler(s_serveur, &uri_main);
     httpd_register_uri_handler(s_serveur, &uri_status);
     httpd_register_uri_handler(s_serveur, &uri_cmd);
     httpd_register_uri_handler(s_serveur, &uri_settings);
     httpd_register_uri_handler(s_serveur, &uri_save);
+    httpd_register_uri_handler(s_serveur, &uri_ota);
 
     ESP_LOGI(TAG, "Serveur HTTP démarré sur le port %d.", http_config.server_port);
 }

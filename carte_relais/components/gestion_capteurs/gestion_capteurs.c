@@ -79,7 +79,7 @@ void capteurs_debitmetre_update(void)
     /* En simulation, générer un débit fictif si pompe active */
     extern bool actionneurs_pompe_est_active(void);
     if (actionneurs_pompe_est_active()) {
-        s_debit_lpm = 15.0f + (float)(esp_timer_get_time() % 50) / 10.0f;
+        s_debit_lpm = 45.0f + (float)(esp_timer_get_time() % 50) / 10.0f;
         /* Accumuler le volume directement (débit × durée du tick) */
         float delta_s = (float)delta_us / 1000000.0f;
         s_volume_session_l += s_debit_lpm * delta_s / 60.0f;
