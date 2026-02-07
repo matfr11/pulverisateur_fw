@@ -47,15 +47,15 @@ static const char *TAG = "ECRAN_UI";
 #define SCREEN_H        600
 #define TOPBAR_H        44
 #define MAIN_H          (SCREEN_H - TOPBAR_H)
-#define PANEL_PAD       8
-#define CARD_PAD_H      8
-#define CARD_PAD_V      6
+#define PANEL_PAD       10
+#define CARD_PAD_H      10
+#define CARD_PAD_V      8
 #define CARD_RADIUS     10
-#define BTN_H           52
+#define BTN_H           60
 #define BTN_RADIUS      8
-#define GAUGE_H         24
+#define GAUGE_H         30
 #define GAUGE_RADIUS    5
-#define VANNE_BTN_H     44
+#define VANNE_BTN_H     50
 
 /* ====================================================================
  * CALLBACKS
@@ -188,12 +188,13 @@ static lv_obj_t *create_section_title(lv_obj_t *parent, const char *text)
     lv_obj_set_width(lbl, lv_pct(100));
     lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(lbl, COL_WHITE, 0);
-    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_18, 0);
     lv_obj_set_style_text_letter_space(lbl, 2, 0);
     lv_obj_set_style_border_color(lbl, COL_BLUE, 0);
     lv_obj_set_style_border_width(lbl, 2, 0);
     lv_obj_set_style_border_side(lbl, LV_BORDER_SIDE_BOTTOM, 0);
-    lv_obj_set_style_pad_bottom(lbl, 4, 0);
+    lv_obj_set_style_pad_bottom(lbl, 8, 0);
+    lv_obj_set_style_pad_top(lbl, 4, 0);
     return lbl;
 }
 
@@ -565,13 +566,13 @@ static void create_main_screen(void)
     /* Panneau 1 — Pompage (flex-grow: 2) */
     lv_obj_t *panel1 = lv_obj_create(main_area);
     lv_obj_remove_style_all(panel1);
-    lv_obj_set_flex_grow(panel1, 2);
+    lv_obj_set_flex_grow(panel1, 1);
     lv_obj_set_height(panel1, lv_pct(100));
     lv_obj_set_style_bg_color(panel1, COL_BG, 0);
     lv_obj_set_style_bg_opa(panel1, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel1, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel1, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel1, 6, 0);
+    lv_obj_set_style_pad_row(panel1, 12, 0);
     lv_obj_set_style_border_color(panel1, COL_SEPARATOR, 0);
     lv_obj_set_style_border_width(panel1, 1, 0);
     lv_obj_set_style_border_side(panel1, LV_BORDER_SIDE_RIGHT, 0);
@@ -587,7 +588,7 @@ static void create_main_screen(void)
     lv_obj_set_style_bg_opa(panel2, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel2, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel2, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel2, 6, 0);
+    lv_obj_set_style_pad_row(panel2, 12, 0);
     lv_obj_set_style_border_color(panel2, COL_SEPARATOR, 0);
     lv_obj_set_style_border_width(panel2, 1, 0);
     lv_obj_set_style_border_side(panel2, LV_BORDER_SIDE_RIGHT, 0);
@@ -597,13 +598,13 @@ static void create_main_screen(void)
     /* Panneau 3 — Vannes & Cuve AR (flex-grow: 2) */
     lv_obj_t *panel3 = lv_obj_create(main_area);
     lv_obj_remove_style_all(panel3);
-    lv_obj_set_flex_grow(panel3, 2);
+    lv_obj_set_flex_grow(panel3, 1);
     lv_obj_set_height(panel3, lv_pct(100));
     lv_obj_set_style_bg_color(panel3, COL_BG, 0);
     lv_obj_set_style_bg_opa(panel3, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel3, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel3, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel3, 6, 0);
+    lv_obj_set_style_pad_row(panel3, 12, 0);
     lv_obj_set_scrollbar_mode(panel3, LV_SCROLLBAR_MODE_OFF);
     create_panel_vannes(panel3);
 }
@@ -697,6 +698,7 @@ static void create_settings_screen(void)
         lv_obj_set_size(row, lv_pct(100), 56);
         lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);  /* ← AJOUTER */
 
         /* Label du paramètre */
         lv_obj_t *lbl = lv_label_create(row);
@@ -713,6 +715,7 @@ static void create_settings_screen(void)
         lv_obj_set_flex_flow(ctrl, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(ctrl, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         lv_obj_set_style_pad_column(ctrl, 4, 0);
+        lv_obj_clear_flag(ctrl, LV_OBJ_FLAG_SCROLLABLE);  /* ← AJOUTER */
 
         /* Bouton [-] */
         lv_obj_t *btn_dec = lv_btn_create(ctrl);

@@ -1,4 +1,23 @@
 # Exclut TOUS les dossiers build et managed_components du dépôt
 **/build/
 **/managed_components/
-**/dependencies.lock
+**/dependencies.lock* . z i p 
+# 1. Ignorer tout ce qui se trouve dans le dossier carte_ecran/ESP-IDF/
+carte_ecran/ESP-IDF/*
+
+# 2. Autoriser uniquement le dossier de ton projet v8
+!carte_ecran/ESP-IDF/lvgl_demo_v8/
+
+# 3. Sécurité supplémentaire : Ignorer les dossiers lourds à l'intérieur de v8
+carte_ecran/ESP-IDF/lvgl_demo_v8/build/
+carte_ecran/ESP-IDF/lvgl_demo_v8/managed_components/
+carte_ecran/ESP-IDF/lvgl_demo_v8/dependencies.lock
+
+# 4. Ignorer globalement les fichiers compressés et temporaires
+*.zip
+*.tar.gz
+*.7z
+sdkconfig
+sdkconfig.old
+.vscode/
+ 
