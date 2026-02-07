@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../commun"
+		},
+		{
+			"path": "../carte_ecran"
+		}
+	],
+	"settings": {}
+}

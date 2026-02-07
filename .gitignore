@@ -1,0 +1,4 @@
+# Exclut TOUS les dossiers build et managed_components du dépôt
+**/build/
+**/managed_components/
+**/dependencies.lock

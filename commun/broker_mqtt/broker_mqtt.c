@@ -428,7 +428,7 @@ static void traiter_subscribe(int idx, uint8_t *payload, int len, uint16_t packe
 
         if (slot >= 0) {
             s_souscriptions[slot].client_idx = idx;
-            strncpy(s_souscriptions[slot].filtre, filtre, BROKER_TAILLE_TOPIC_MAX - 1);
+            strlcpy(s_souscriptions[slot].filtre, filtre, BROKER_TAILLE_TOPIC_MAX);
             s_souscriptions[slot].qos = qos_demande > 1 ? 1 : qos_demande;  /* Cap QoS à 1 */
             codes_retour[nb_codes++] = s_souscriptions[slot].qos;
             ESP_LOGI(TAG, "Client [%d] SUBSCRIBE '%s' QoS %d", idx, filtre, s_souscriptions[slot].qos);
@@ -614,7 +614,7 @@ static void stocker_retain(const char *topic, const uint8_t *payload, int payloa
     }
 
     s_retain[slot].actif = true;
-    strncpy(s_retain[slot].topic, topic, BROKER_TAILLE_TOPIC_MAX - 1);
+    strlcpy(s_retain[slot].topic, topic, BROKER_TAILLE_TOPIC_MAX);
     memcpy(s_retain[slot].payload, payload, payload_len < BROKER_TAILLE_PAYLOAD_MAX ? payload_len : BROKER_TAILLE_PAYLOAD_MAX);
     s_retain[slot].payload_len = payload_len < BROKER_TAILLE_PAYLOAD_MAX ? payload_len : BROKER_TAILLE_PAYLOAD_MAX;
     s_retain[slot].qos = qos;
