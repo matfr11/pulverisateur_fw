@@ -1,9 +1,0 @@
-# ninja log v6
-267	805	7921925871701653	project_elf_src_esp32p4.c	3d8eebb19e811805
-267	805	7921925871701653	C:/esp/pulverisateur_fw/carte_relais/build/project_elf_src_esp32p4.c	3d8eebb19e811805
-287	828	7921925872005970	ota_data_initial.bin	a5dc11123ba37883
-287	828	7921925872005970	C:/esp/pulverisateur_fw/carte_relais/build/ota_data_initial.bin	a5dc11123ba37883
-236	1709	7921925881404907	esp-idf/esp_system/ld/sections.ld.in	5a9d5e1e8a349745
-236	1709	7921925881404907	C:/esp/pulverisateur_fw/carte_relais/build/esp-idf/esp_system/ld/sections.ld.in	5a9d5e1e8a349745
-216	1922	7921925883454782	esp-idf/esp_system/ld/memory.ld	9e3c1ea18da15060
-216	1922	7921925883454782	C:/esp/pulverisateur_fw/carte_relais/build/esp-idf/esp_system/ld/memory.ld	9e3c1ea18da15060

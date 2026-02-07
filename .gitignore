@@ -2,22 +2,20 @@
 **/build/
 **/managed_components/
 **/dependencies.lock* . z i p 
-# 1. Ignorer tout ce qui se trouve dans le dossier carte_ecran/ESP-IDF/
-carte_ecran/ESP-IDF/*
+# --- Exclusions spécifiques demandées ---
+# Ignore les composants espressif dans le dossier carte_ecran
+carte_ecran/components/espressif__esp-brookesia/
+carte_ecran/components/espressif__esp_cam_sensor/
 
-# 2. Autoriser uniquement le dossier de ton projet v8
+# --- Rappel des règles précédentes pour lvgl_demo_v8 ---
+carte_ecran/ESP-IDF/*
 !carte_ecran/ESP-IDF/lvgl_demo_v8/
 
-# 3. Sécurité supplémentaire : Ignorer les dossiers lourds à l'intérieur de v8
+# On ignore le build et les composants gérés dans le projet v8
 carte_ecran/ESP-IDF/lvgl_demo_v8/build/
 carte_ecran/ESP-IDF/lvgl_demo_v8/managed_components/
 carte_ecran/ESP-IDF/lvgl_demo_v8/dependencies.lock
 
-# 4. Ignorer globalement les fichiers compressés et temporaires
+# Sécurité globale
 *.zip
 *.tar.gz
-*.7z
-sdkconfig
-sdkconfig.old
-.vscode/
- 

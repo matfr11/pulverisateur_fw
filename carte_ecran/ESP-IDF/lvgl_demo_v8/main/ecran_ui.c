@@ -51,11 +51,11 @@ static const char *TAG = "ECRAN_UI";
 #define CARD_PAD_H      10
 #define CARD_PAD_V      8
 #define CARD_RADIUS     10
-#define BTN_H           60
+#define BTN_H           70
 #define BTN_RADIUS      8
-#define GAUGE_H         30
+#define GAUGE_H         34
 #define GAUGE_RADIUS    5
-#define VANNE_BTN_H     50
+#define VANNE_BTN_H     56
 
 /* ====================================================================
  * CALLBACKS
@@ -238,7 +238,7 @@ static lv_obj_t *create_gauge(lv_obj_t *parent, lv_obj_t **lbl_out,
     lv_label_set_text(lbl, init_text);
     lv_obj_align(lbl, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_text_color(lbl, COL_WHITE, 0);
-    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_16, 0);
 
     if (lbl_out) *lbl_out = lbl;
     return bar;
@@ -436,7 +436,7 @@ static void create_panel_pompage(lv_obj_t *parent)
     lv_obj_t *card_debit = lv_obj_create(parent);
     lv_obj_remove_style_all(card_debit);
     lv_obj_add_style(card_debit, &sty_card, 0);
-    lv_obj_set_size(card_debit, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_debit, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_debit, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_debit, "DEBIT INSTANTANE");
     s_bar_debit = create_gauge(card_debit, &s_lbl_debit, COL_GREEN, "-- L/min");
@@ -461,7 +461,7 @@ static void create_panel_automate(lv_obj_t *parent)
     lv_obj_t *card_tr = lv_obj_create(parent);
     lv_obj_remove_style_all(card_tr);
     lv_obj_add_style(card_tr, &sty_card, 0);
-    lv_obj_set_size(card_tr, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_tr, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_tr, LV_FLEX_FLOW_COLUMN);
     s_btn_auto_tr = create_btn_full(card_tr, &s_lbl_auto_tr, "LANCER TRANSFERT",
                                      evt_cmd, (void *)CMD_AUTO_TR);
@@ -471,7 +471,7 @@ static void create_panel_automate(lv_obj_t *parent)
     lv_obj_t *card_br = lv_obj_create(parent);
     lv_obj_remove_style_all(card_br);
     lv_obj_add_style(card_br, &sty_card, 0);
-    lv_obj_set_size(card_br, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_br, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_br, LV_FLEX_FLOW_COLUMN);
     s_btn_auto_br = create_btn_full(card_br, &s_lbl_auto_br, "AUTO BRASSAGE",
                                      evt_cmd, (void *)CMD_AUTO_BR);
@@ -498,7 +498,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_niv = lv_obj_create(parent);
     lv_obj_remove_style_all(card_niv);
     lv_obj_add_style(card_niv, &sty_card, 0);
-    lv_obj_set_size(card_niv, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_niv, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_niv, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_niv, "NIVEAU CUVE ARRIERE");
     s_bar_niveau = create_gauge(card_niv, &s_lbl_niveau, COL_BLUE, "-- L");
@@ -507,7 +507,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_v2m = lv_obj_create(parent);
     lv_obj_remove_style_all(card_v2m);
     lv_obj_add_style(card_v2m, &sty_card, 0);
-    lv_obj_set_size(card_v2m, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_v2m, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_v2m, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_v2m, "VANNE 2M");
     lv_obj_t *row_v2m = lv_obj_create(card_v2m);
@@ -523,7 +523,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_vbt = lv_obj_create(parent);
     lv_obj_remove_style_all(card_vbt);
     lv_obj_add_style(card_vbt, &sty_card, 0);
-    lv_obj_set_size(card_vbt, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(card_vbt, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(card_vbt, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_vbt, "BOUT DE RAMPE");
     lv_obj_t *row_vbt = lv_obj_create(card_vbt);
@@ -572,7 +572,9 @@ static void create_main_screen(void)
     lv_obj_set_style_bg_opa(panel1, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel1, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel1, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel1, 12, 0);
+    //lv_obj_set_style_pad_row(panel1, 12, 0);
+    //Ça supprime le padding fixe et laisse LVGL répartir uniformément les boutons/jauges sur toute la hauteur.
+    lv_obj_set_flex_align(panel1, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_border_color(panel1, COL_SEPARATOR, 0);
     lv_obj_set_style_border_width(panel1, 1, 0);
     lv_obj_set_style_border_side(panel1, LV_BORDER_SIDE_RIGHT, 0);
@@ -588,7 +590,9 @@ static void create_main_screen(void)
     lv_obj_set_style_bg_opa(panel2, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel2, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel2, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel2, 12, 0);
+    //lv_obj_set_style_pad_row(panel2, 12, 0);
+    //Ça supprime le padding fixe et laisse LVGL répartir uniformément les boutons/jauges sur toute la hauteur.
+    lv_obj_set_flex_align(panel2, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_border_color(panel2, COL_SEPARATOR, 0);
     lv_obj_set_style_border_width(panel2, 1, 0);
     lv_obj_set_style_border_side(panel2, LV_BORDER_SIDE_RIGHT, 0);
@@ -604,7 +608,9 @@ static void create_main_screen(void)
     lv_obj_set_style_bg_opa(panel3, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(panel3, PANEL_PAD, 0);
     lv_obj_set_flex_flow(panel3, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(panel3, 12, 0);
+    //lv_obj_set_style_pad_row(panel3, 12, 0);
+    //Ça supprime le padding fixe et laisse LVGL répartir uniformément les boutons/jauges sur toute la hauteur.
+    lv_obj_set_flex_align(panel3, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(panel3, LV_SCROLLBAR_MODE_OFF);
     create_panel_vannes(panel3);
 }
@@ -706,7 +712,7 @@ static void create_settings_screen(void)
         snprintf(label_txt, sizeof(label_txt), "%s (%s)", def->label, def->unit);
         lv_label_set_text(lbl, label_txt);
         lv_obj_set_style_text_color(lbl, COL_TEXT, 0);
-        lv_obj_set_style_text_font(lbl, &lv_font_montserrat_14, 0);
+        lv_obj_set_style_text_font(lbl, &lv_font_montserrat_16, 0);
 
         /* Groupe de contrôle : [-] spinbox [+] */
         lv_obj_t *ctrl = lv_obj_create(row);
