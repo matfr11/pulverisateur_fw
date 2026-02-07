@@ -153,6 +153,12 @@ static const char PAGE_PART2[] =
 "<div class='slide'>"
 "<h2>VANNES &amp; PHARES AR</h2>"
 "<div class='control-card'>"
+"<div class='card-title'>Niveau Cuve Arri&egrave;re</div>"
+"<div class='h-gauge-container'>"
+"<div id='jFillNiv' class='h-gauge-fill' style='background:#3399ff'></div>"
+"<div id='jTextNiv' class='h-gauge-text'>-- %</div>"
+"</div></div>"
+"<div class='control-card'>"
 "<div class='card-title'>Vanne 2m</div>"
 "<div class='btn-group'>"
 "<button id='v2m_F' class='btn-v' onclick=\"api('arriere','v2m_fermer')\">FERMER</button>"
@@ -232,6 +238,13 @@ static const char PAGE_PART2[] =
 "      if(sEl) sEl.className='btn-v '+(d[v]=='S'?'active-off':'');"
 "      if(fEl) fEl.className='btn-v '+(d[v]=='F'?'active-red':'');"
 "    });"
+"    var fillNiv=document.getElementById('jFillNiv');"
+"    var textNiv=document.getElementById('jTextNiv');"
+"    if(d.sonde_ok){"
+"      fillNiv.style.width=Math.min(d.niveau_ar,100)+'%';"
+"      fillNiv.style.background=d.niveau_ar<15?'#e74c3c':d.niveau_ar<30?'#f39c12':'#3399ff';"
+"      textNiv.innerText=Math.round(d.niveau_ar)+' %';"
+"    }else{fillNiv.style.width='0%';textNiv.innerText='AR OFFLINE';}"
 "  }).catch(function(){"
 "    document.getElementById('status-tag').className='offline';"
 "    document.getElementById('status-tag').innerText='LIAISON PERDUE';"
@@ -285,7 +298,9 @@ static esp_err_t handler_status(httpd_req_t *req)
     cJSON_AddStringToObject(json, "vbt",
         (idx_vbt >= 0 && idx_vbt < 5) ? map_vanne[idx_vbt] : "?");
     cJSON_AddBoolToObject(json, "li", s_etat_arriere.phares_arriere);
-
+        /* niveau cuve arriere*/
+    cJSON_AddNumberToObject(json, "niveau_ar", s_etat_arriere.niveau_cuve_arriere);
+    cJSON_AddBoolToObject(json, "sonde_ok", s_etat_arriere.sonde_niveau_ok);
     char *str = cJSON_PrintUnformatted(json);
     cJSON_Delete(json);
 
