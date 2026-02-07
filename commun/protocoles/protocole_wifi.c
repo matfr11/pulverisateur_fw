@@ -266,14 +266,8 @@ bool wifi_failover_est_demande(void)
 
 esp_err_t wifi_initialiser(role_reseau_t *role_out)
 {
-    /* Initialisation NVS (nécessaire pour WiFi) */
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
+    /* NVS déjà initialisé dans app_initialiser() */
+    esp_err_t ret;
     /* Initialisation réseau */
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());

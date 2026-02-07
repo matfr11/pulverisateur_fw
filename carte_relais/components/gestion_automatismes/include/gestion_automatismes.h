@@ -35,6 +35,9 @@ void automatismes_transfert_arreter(void);
 /** Retourne l'état du transfert */
 etat_auto_transfert_t automatismes_get_etat_transfert(void);
 
+//**volume transferé */
+float automatismes_get_volume_transfere(void);
+
 /* ====================================================================
  * BRASSAGE AUTOMATIQUE
  *

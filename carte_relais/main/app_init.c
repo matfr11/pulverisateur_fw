@@ -11,6 +11,7 @@
 #include "gestion_actionneurs.h"
 #include "gestion_capteurs.h"
 #include "gestion_configuration.h"
+#include "nvs_flash.h"
 
 #if A_DEBITMETRE
 #include "gestion_automatismes.h"
@@ -182,6 +183,14 @@ void app_initialiser(void)
     ESP_LOGW(TAG, " *** MODE SIMULATION ACTIF ***");
 #endif
     ESP_LOGI(TAG, "========================================");
+
+    /* 0. Initialiser NVS (nécessaire pour config ET WiFi) */
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
 
     /* 1. Charger la configuration depuis NVS */
     configuration_initialiser();
@@ -363,7 +372,7 @@ void app_tache_principale(void *pvParameters)
                     .vanne_3v = actionneurs_v3v_est_transfert() ? V3V_TRANSFERT : V3V_BRASSAGE,
                     .phares_avant = actionneurs_phares_avant_actifs(),
                     .debit_instantane = capteurs_debitmetre_get_debit(),
-                    .volume_session = capteurs_debitmetre_get_volume_session(),
+                    .volume_session = automatismes_get_volume_transfere(),
                     .debitmetre_ok = capteurs_debitmetre_est_ok(),
                     .auto_transfert = automatismes_get_etat_transfert(),
                     .auto_brassage = automatismes_get_etat_brassage(),

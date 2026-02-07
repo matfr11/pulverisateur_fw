@@ -16,15 +16,15 @@ static const char *TAG = "ACTIONNEURS";
  * ==================================================================== */
 static inline void gpio_relais_set(gpio_num_t pin, bool actif)
 {
-#ifndef MODE_SIMULATION
+//#ifndef MODE_SIMULATION
     gpio_set_level(pin, actif ? RELAIS_NIVEAU_ACTIF : !RELAIS_NIVEAU_ACTIF);
-#endif
+//#endif
     ESP_LOGD(TAG, "GPIO %d → %s", pin, actif ? "ON" : "OFF");
 }
 
 static void gpio_configurer_sortie(gpio_num_t pin)
 {
-#ifndef MODE_SIMULATION
+//#ifndef MODE_SIMULATION
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << pin),
         .mode = GPIO_MODE_OUTPUT,
@@ -34,7 +34,7 @@ static void gpio_configurer_sortie(gpio_num_t pin)
     };
     gpio_config(&io_conf);
     gpio_set_level(pin, !RELAIS_NIVEAU_ACTIF); /* OFF par défaut */
-#endif
+//#endif
 }
 
 /* ====================================================================

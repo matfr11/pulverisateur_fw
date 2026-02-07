@@ -25,12 +25,15 @@ static struct {
     etat_auto_transfert_t etat;
     uint32_t    volume_cible;       /* Litres */
     float       volume_debut;       /* Volume session au démarrage */
+    float       volume_transfere;   /* Litres transférés (auto + manuel) */
+    bool        en_transfert_manuel; /* Pompe ON + vanne transfert sans auto */
 } s_transfert = {
     .etat = AUTO_TR_INACTIF,
     .volume_cible = 0,
     .volume_debut = 0.0f,
+    .volume_transfere = 0.0f,
+    .en_transfert_manuel = false,
 };
-
 /* ====================================================================
  * ÉTAT INTERNE DU BRASSAGE
  * ==================================================================== */
@@ -69,7 +72,7 @@ void automatismes_transfert_activer(const configuration_t *config)
     s_transfert.volume_cible = config->volume_transfert;
     s_transfert.volume_debut = capteurs_debitmetre_get_volume_session();
     s_transfert.etat = AUTO_TR_EN_COURS;
-
+    s_transfert.volume_transfere = 0.0f; //  Remettre à zéro à l'activation du transfert auto
     /* Positionner la vanne 3 voies en mode transfert */
     actionneurs_v3v_set(V3V_TRANSFERT);
 
@@ -171,7 +174,7 @@ void automatismes_get_brassage_info(char *label_out, size_t label_size,
         snprintf(label_out, label_size, "MARCHE");
         int64_t restant_ms = (int64_t)s_brassage.temps_on_ms - ecart_ms;
         if (restant_ms < 0) restant_ms = 0;
-        *temps_restant_out = (float)restant_ms / 60000.0f;
+        *temps_restant_out = (float)restant_ms / 1000.0f;  /* en secondes */
         *pourcentage_out = (s_brassage.temps_on_ms > 0)
             ? ((float)ecart_ms / (float)s_brassage.temps_on_ms * 100.0f)
             : 0.0f;
@@ -181,7 +184,7 @@ void automatismes_get_brassage_info(char *label_out, size_t label_size,
         snprintf(label_out, label_size, "PAUSE");
         int64_t restant_ms = (int64_t)s_brassage.temps_off_ms - ecart_ms;
         if (restant_ms < 0) restant_ms = 0;
-        *temps_restant_out = (float)restant_ms / 60000.0f;
+        *temps_restant_out = (float)restant_ms / 1000.0f;  /* en secondes */
         *pourcentage_out = (s_brassage.temps_off_ms > 0)
             ? ((float)ecart_ms / (float)s_brassage.temps_off_ms * 100.0f)
             : 0.0f;
@@ -211,11 +214,32 @@ void automatismes_update(float debit_lpm, float volume_session)
 {
     int64_t maintenant = esp_timer_get_time() / 1000;
 
-    /* --- TRANSFERT --- */
+/* --- TRANSFERT (auto + manuel) --- */
+    bool pompe_active = actionneurs_pompe_est_active();
+    bool vanne_transfert = actionneurs_v3v_est_transfert();
+    bool en_transfert = pompe_active && vanne_transfert;
+
+    /* Détection début transfert manuel (pompe + vanne transfert sans auto) */
+    if (en_transfert && s_transfert.etat == AUTO_TR_INACTIF && !s_transfert.en_transfert_manuel) {
+        s_transfert.en_transfert_manuel = true;
+        s_transfert.volume_debut = volume_session;
+        s_transfert.volume_transfere = 0.0f;
+        ESP_LOGI(TAG, "Transfert manuel détecté, compteur remis à zéro.");
+    }
+    /* Fin du transfert manuel */
+    if (s_transfert.en_transfert_manuel && !en_transfert) {
+        s_transfert.en_transfert_manuel = false;
+    }
+
+    /* Mise à jour du volume transféré (auto ou manuel) */
+    if (en_transfert) {
+        s_transfert.volume_transfere = volume_session - s_transfert.volume_debut;
+    }
+
+    /* Auto-transfert : vérifier si la cible est atteinte */
     if (s_transfert.etat == AUTO_TR_EN_COURS) {
-        float volume_transfere = volume_session - s_transfert.volume_debut;
-        if (volume_transfere >= (float)s_transfert.volume_cible) {
-            ESP_LOGI(TAG, "Transfert terminé : %.1f L transférés.", volume_transfere);
+        if (s_transfert.volume_transfere >= (float)s_transfert.volume_cible) {
+            ESP_LOGI(TAG, "Transfert terminé : %.1f L transférés.", s_transfert.volume_transfere);
             s_transfert.etat = AUTO_TR_TERMINE;
             automatismes_transfert_arreter();
         }
@@ -266,9 +290,13 @@ void automatismes_arreter_tout(void)
     s_transfert.etat = AUTO_TR_INACTIF;
     s_brassage.etat = AUTO_BR_INACTIF;
 }
-
+float automatismes_get_volume_transfere(void)
+{
+    return s_transfert.volume_transfere;
+}
 #else
 /* Stubs pour la carte ARRIÈRE (pas d'automatismes) */
+float automatismes_get_volume_transfere(void) { return 0.0f; }
 void automatismes_initialiser(void) {}
 void automatismes_transfert_activer(const configuration_t *c) { (void)c; }
 void automatismes_transfert_arreter(void) {}

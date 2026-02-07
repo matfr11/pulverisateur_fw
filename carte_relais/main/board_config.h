@@ -28,7 +28,7 @@
 /* ====================================================================
  * MODE SIMULATION (décommenter pour activer)
  * ==================================================================== */
-// #define MODE_SIMULATION  1
+#define MODE_SIMULATION  1
 
 /* ====================================================================
  * CONFIGURATION GPIO - CARTE AVANT (4 relais)

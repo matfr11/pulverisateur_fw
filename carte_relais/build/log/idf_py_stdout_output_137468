@@ -1,0 +1,23 @@
+Command: ninja all
+[1/14] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\bootloader\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/esp/pulverisateur_fw/carte_relais/build/bootloader/bootloader.bin"
+Bootloader binary size 0x66c0 bytes. 0x940 bytes (8%) free.
+[2/14] No install step for 'bootloader'
+[3/14] Completed 'bootloader'
+[4/14] Building C object esp-idf/commun/CMakeFiles/__idf_commun.dir/protocoles/protocole_wifi.c.obj
+[5/14] Linking C static library esp-idf\commun\libcommun.a
+[6/14] Linking C static library esp-idf\gestion_actionneurs\libgestion_actionneurs.a
+[7/14] Linking C static library esp-idf\gestion_capteurs\libgestion_capteurs.a
+[8/14] Linking C static library esp-idf\gestion_securites\libgestion_securites.a
+[9/14] Linking C static library esp-idf\gestion_automatismes\libgestion_automatismes.a
+[10/14] Linking C static library esp-idf\main\libmain.a
+[11/14] Generating esp-idf/esp_system/ld/sections.ld
+[12/14] Linking CXX executable carte_relais.elf
+[13/14] Generating binary image from built executable
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+Generated C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin
+[14/14] C:\WINDOWS\system32\cmd.exe /C "cd /D C:\esp\pulverisateur_fw\carte_relais\build\esp-idf\esptool_py && C:\Users\destr\.espressif\python_env\idf5.5_py3.11_env\Scripts\python.exe C:/Users/destr/esp/v5.5.2/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/esp/pulverisateur_fw/carte_relais/build/partition_table/partition-table.bin C:/esp/pulverisateur_fw/carte_relais/build/carte_relais.bin"
+carte_relais.bin binary size 0xeadf0 bytes. Smallest app partition is 0x1e0000 bytes. 0xf5210 bytes (51%) free.

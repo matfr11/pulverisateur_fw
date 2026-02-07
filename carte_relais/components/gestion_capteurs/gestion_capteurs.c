@@ -86,7 +86,7 @@ void capteurs_debitmetre_update(void)
         delta_impulsions = 0;
     }
     s_debitmetre_ok = true;
-#endif
+#else
 
     /* Calcul du débit : freq = impulsions / durée, débit = freq / K */
     if (delta_us > 0 && s_facteur_k > 0.0f) {
@@ -94,7 +94,7 @@ void capteurs_debitmetre_update(void)
         float freq_hz = (float)delta_impulsions / delta_s;
         s_debit_lpm = (freq_hz / s_facteur_k) * 60.0f;
     }
-
+#endif
     /* Cumul du volume */
     if (s_facteur_k > 0.0f) {
         s_volume_session_l += (float)delta_impulsions / s_facteur_k;
