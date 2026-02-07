@@ -391,11 +391,11 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "<input type='number' step='0.1' id='k_fact' value='%.1f'></div></div>"
         "<h2>S&Eacute;CURIT&Eacute; D&Eacute;BIT</h2>"
         "<div class='control-card'>"
-        "<div class='setting-row'><label>Seuil mini <span class='unit'>(L/min)</span></label>"
+        "<div class='setting-row'><label>Debit mini desamorcage<span class='unit'>(L/min)</span></label>"
         "<input type='number' step='0.1' id='e_flow' value='%.1f'></div>"
-        "<div class='setting-row'><label>D&eacute;lai <span class='unit'>(ms)</span></label>"
+        "<div class='setting-row'><label>D&eacute;lai desamorcage<span class='unit'>(sec)</span></label>"
         "<input type='number' id='e_out' value='%u'></div>"
-        "<div class='setting-row'><label>Timeout Vannes <span class='unit'>(ms)</span></label>"
+        "<div class='setting-row'><label>Timeout Vannes <span class='unit'>(sec)</span></label>"
         "<input type='number' id='v_timeout' value='%u'></div></div>"
         "<h2>CYCLES DE BRASSAGE</h2>"
         "<div class='control-card'>"
@@ -476,8 +476,8 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         (unsigned)s_config_courante.volume_transfert,
         s_config_courante.facteur_k_debitmetre,
         s_config_courante.seuil_debit_cuve_vide,
-        (unsigned)s_config_courante.delai_detection_ms,
-        (unsigned)s_config_courante.timeout_vanne_ms,
+        (unsigned)s_config_courante.delai_detection_ms / 1000,
+        (unsigned)s_config_courante.timeout_vanne_ms / 1000,
         (unsigned)s_config_courante.temps_brassage_on,
         (unsigned)s_config_courante.temps_brassage_off,
         (unsigned)s_config_courante.volume_cuve_ar,
@@ -516,9 +516,9 @@ static esp_err_t handler_save_config(httpd_req_t *req)
     item = cJSON_GetObjectItem(json, "seuil_debit");
     if (item) s_config_courante.seuil_debit_cuve_vide = (float)item->valuedouble;
     item = cJSON_GetObjectItem(json, "delai_detection");
-    if (item) s_config_courante.delai_detection_ms = item->valueint;
+    if (item) s_config_courante.delai_detection_ms = item->valueint * 1000;
     item = cJSON_GetObjectItem(json, "timeout_vanne");
-    if (item) s_config_courante.timeout_vanne_ms = item->valueint;
+    if (item) s_config_courante.timeout_vanne_ms = item->valueint * 1000;
     item = cJSON_GetObjectItem(json, "temps_on");
     if (item) s_config_courante.temps_brassage_on = item->valueint;
     item = cJSON_GetObjectItem(json, "temps_off");

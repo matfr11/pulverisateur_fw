@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "carte_relais",
-    "project_version":    "e50af08-dirty",
+    "project_version":    "d663cca-dirty",
     "project_path":       "C:/esp/pulverisateur_fw/carte_relais",
     "idf_path":           "C:/Users/destr/esp/v5.5.2/esp-idf",
     "build_dir":          "C:/esp/pulverisateur_fw/carte_relais/build",
