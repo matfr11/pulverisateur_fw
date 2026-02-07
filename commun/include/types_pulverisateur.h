@@ -182,6 +182,11 @@ typedef struct {
     /* Actionneurs */
     uint32_t timeout_vanne_ms;      /* ms – timeout vannes motorisées */
 
+    /* Cuve arrière */
+    uint32_t volume_cuve_ar;        /* Litres – capacité totale cuve arrière */
+    uint32_t sonde_hauteur_max_mm;  /* mm – hauteur max sonde (= pleine échelle) */
+    uint32_t sonde_offset_mm;       /* mm – offset de montage sonde (fond de cuve) */
+
     /* Système */
     uint32_t version_protocole;
 } configuration_t;
@@ -196,6 +201,9 @@ typedef struct {
     .temps_brassage_off     = 300, \
     .facteur_k_debitmetre   = 4.72f, \
     .timeout_vanne_ms       = 30000, \
+    .volume_cuve_ar         = 1000, \
+    .sonde_hauteur_max_mm   = 2000, \
+    .sonde_offset_mm        = 0, \
     .version_protocole      = VERSION_PROTOCOLE, \
 }
 

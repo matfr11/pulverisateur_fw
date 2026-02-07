@@ -240,10 +240,11 @@ static const char PAGE_PART2[] =
 "    });"
 "    var fillNiv=document.getElementById('jFillNiv');"
 "    var textNiv=document.getElementById('jTextNiv');"
-"    if(d.sonde_ok){"
-"      fillNiv.style.width=Math.min(d.niveau_ar,100)+'%';"
-"      fillNiv.style.background=d.niveau_ar<15?'#e74c3c':d.niveau_ar<30?'#f39c12':'#3399ff';"
-"      textNiv.innerText=Math.round(d.niveau_ar)+' %';"
+"    if(d.sonde_ok&&d.niveau_ar_max>0){"
+"      var pct=d.niveau_ar/d.niveau_ar_max*100;"
+"      fillNiv.style.width=Math.min(pct,100)+'%';"
+"      fillNiv.style.background=pct<15?'#e74c3c':pct<30?'#f39c12':'#3399ff';"
+"      textNiv.innerText=Math.round(d.niveau_ar)+' / '+d.niveau_ar_max+' L';"
 "    }else{fillNiv.style.width='0%';textNiv.innerText='AR OFFLINE';}"
 "  }).catch(function(){"
 "    document.getElementById('status-tag').className='offline';"
@@ -299,7 +300,9 @@ static esp_err_t handler_status(httpd_req_t *req)
         (idx_vbt >= 0 && idx_vbt < 5) ? map_vanne[idx_vbt] : "?");
     cJSON_AddBoolToObject(json, "li", s_etat_arriere.phares_arriere);
         /* niveau cuve arriere*/
-    cJSON_AddNumberToObject(json, "niveau_ar", s_etat_arriere.niveau_cuve_arriere);
+    float litres_ar = s_etat_arriere.niveau_cuve_arriere * s_config_courante.volume_cuve_ar / 100.0f;
+    cJSON_AddNumberToObject(json, "niveau_ar", litres_ar);
+    cJSON_AddNumberToObject(json, "niveau_ar_max", s_config_courante.volume_cuve_ar);
     cJSON_AddBoolToObject(json, "sonde_ok", s_etat_arriere.sonde_niveau_ok);
     char *str = cJSON_PrintUnformatted(json);
     cJSON_Delete(json);
@@ -387,6 +390,14 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "<input type='number' id='br_on' value='%u'></div>"
         "<div class='setting-row'><label>Repos <span class='unit'>(sec)</span></label>"
         "<input type='number' id='br_off' value='%u'></div></div>"
+        "<h2>CUVE ARRI&Egrave;RE</h2>"
+        "<div class='control-card'>"
+        "<div class='setting-row'><label>Volume total <span class='unit'>(L)</span></label>"
+        "<input type='number' id='vol_ar' value='%u'></div>"
+        "<div class='setting-row'><label>Hauteur max sonde <span class='unit'>(mm)</span></label>"
+        "<input type='number' id='s_hmax' value='%u'></div>"
+        "<div class='setting-row'><label>Offset sonde <span class='unit'>(mm)</span></label>"
+        "<input type='number' id='s_off' value='%u'></div></div>"
         "<br><button class='btn-full active-green' onclick='saveSettings()'>"
         "ENREGISTRER</button></div>"
         "<script>"
@@ -398,7 +409,10 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "    delai_detection:+document.getElementById('e_out').value,"
         "    timeout_vanne:+document.getElementById('v_timeout').value,"
         "    temps_on:+document.getElementById('br_on').value,"
-        "    temps_off:+document.getElementById('br_off').value"
+        "    temps_off:+document.getElementById('br_off').value,"
+        "    volume_cuve_ar:+document.getElementById('vol_ar').value,"
+        "    sonde_hauteur_max:+document.getElementById('s_hmax').value,"
+        "    sonde_offset:+document.getElementById('s_off').value"
         "  };"
         "  fetch('/api/save_config',{method:'POST',"
         "    headers:{'Content-Type':'application/json'},"
@@ -414,7 +428,10 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         (unsigned)s_config_courante.delai_detection_ms,
         (unsigned)s_config_courante.timeout_vanne_ms,
         (unsigned)s_config_courante.temps_brassage_on,
-        (unsigned)s_config_courante.temps_brassage_off
+        (unsigned)s_config_courante.temps_brassage_off,
+        (unsigned)s_config_courante.volume_cuve_ar,
+        (unsigned)s_config_courante.sonde_hauteur_max_mm,
+        (unsigned)s_config_courante.sonde_offset_mm
     );
 
     httpd_resp_set_type(req, "text/html");
@@ -455,6 +472,12 @@ static esp_err_t handler_save_config(httpd_req_t *req)
     if (item) s_config_courante.temps_brassage_on = item->valueint;
     item = cJSON_GetObjectItem(json, "temps_off");
     if (item) s_config_courante.temps_brassage_off = item->valueint;
+    item = cJSON_GetObjectItem(json, "volume_cuve_ar");
+    if (item) s_config_courante.volume_cuve_ar = item->valueint;
+    item = cJSON_GetObjectItem(json, "sonde_hauteur_max");
+    if (item) s_config_courante.sonde_hauteur_max_mm = item->valueint;
+    item = cJSON_GetObjectItem(json, "sonde_offset");
+    if (item) s_config_courante.sonde_offset_mm = item->valueint;
 
     cJSON_Delete(json);
 
