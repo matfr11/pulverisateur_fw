@@ -2,20 +2,23 @@
 **/build/
 **/managed_components/
 **/dependencies.lock* . z i p 
-# --- Exclusions spécifiques demandées ---
-# Ignore les composants espressif dans le dossier carte_ecran
-carte_ecran/components/espressif__esp-brookesia/
-carte_ecran/components/espressif__esp_cam_sensor/
+# --- TRÈS IMPORTANT : ON GARDE CES COMPOSANTS LOCAUX ---
+# !carte_ecran/ESP-IDF/lvgl_demo_v8/components/bsp_extra/
+# !carte_ecran/ESP-IDF/lvgl_demo_v8/components/espressif__esp32_p4_function_ev_board/
 
-# --- Rappel des règles précédentes pour lvgl_demo_v8 ---
+# --- ON IGNORE TOUT LE RESTE ---
 carte_ecran/ESP-IDF/*
 !carte_ecran/ESP-IDF/lvgl_demo_v8/
 
-# On ignore le build et les composants gérés dans le projet v8
-carte_ecran/ESP-IDF/lvgl_demo_v8/build/
-carte_ecran/ESP-IDF/lvgl_demo_v8/managed_components/
-carte_ecran/ESP-IDF/lvgl_demo_v8/dependencies.lock
+# On ignore les dossiers de compilation et de téléchargement automatique
+**/build/
+**/managed_components/
+**/dependencies.lock
 
-# Sécurité globale
+# On ignore les composants "Brookesia" et "Cam" qui sont trop lourds
+carte_ecran/components/espressif__esp-brookesia/
+carte_ecran/components/espressif__esp_cam_sensor/
+
+# On ignore les archives (le ZIP qui bloque tout)
 *.zip
-*.tar.gz
+*.rar

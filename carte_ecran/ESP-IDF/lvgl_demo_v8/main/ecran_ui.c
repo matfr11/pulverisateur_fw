@@ -436,7 +436,7 @@ static void create_panel_pompage(lv_obj_t *parent)
     lv_obj_t *card_debit = lv_obj_create(parent);
     lv_obj_remove_style_all(card_debit);
     lv_obj_add_style(card_debit, &sty_card, 0);
-    lv_obj_set_size(card_debit, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_debit, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_debit, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_debit, "DEBIT INSTANTANE");
     s_bar_debit = create_gauge(card_debit, &s_lbl_debit, COL_GREEN, "-- L/min");
@@ -461,7 +461,7 @@ static void create_panel_automate(lv_obj_t *parent)
     lv_obj_t *card_tr = lv_obj_create(parent);
     lv_obj_remove_style_all(card_tr);
     lv_obj_add_style(card_tr, &sty_card, 0);
-    lv_obj_set_size(card_tr, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_tr, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_tr, LV_FLEX_FLOW_COLUMN);
     s_btn_auto_tr = create_btn_full(card_tr, &s_lbl_auto_tr, "LANCER TRANSFERT",
                                      evt_cmd, (void *)CMD_AUTO_TR);
@@ -471,7 +471,7 @@ static void create_panel_automate(lv_obj_t *parent)
     lv_obj_t *card_br = lv_obj_create(parent);
     lv_obj_remove_style_all(card_br);
     lv_obj_add_style(card_br, &sty_card, 0);
-    lv_obj_set_size(card_br, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_br, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_br, LV_FLEX_FLOW_COLUMN);
     s_btn_auto_br = create_btn_full(card_br, &s_lbl_auto_br, "AUTO BRASSAGE",
                                      evt_cmd, (void *)CMD_AUTO_BR);
@@ -498,7 +498,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_niv = lv_obj_create(parent);
     lv_obj_remove_style_all(card_niv);
     lv_obj_add_style(card_niv, &sty_card, 0);
-    lv_obj_set_size(card_niv, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_niv, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_niv, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_niv, "NIVEAU CUVE ARRIERE");
     s_bar_niveau = create_gauge(card_niv, &s_lbl_niveau, COL_BLUE, "-- L");
@@ -507,7 +507,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_v2m = lv_obj_create(parent);
     lv_obj_remove_style_all(card_v2m);
     lv_obj_add_style(card_v2m, &sty_card, 0);
-    lv_obj_set_size(card_v2m, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_v2m, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_v2m, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_v2m, "VANNE 2M");
     lv_obj_t *row_v2m = lv_obj_create(card_v2m);
@@ -523,7 +523,7 @@ static void create_panel_vannes(lv_obj_t *parent)
     lv_obj_t *card_vbt = lv_obj_create(parent);
     lv_obj_remove_style_all(card_vbt);
     lv_obj_add_style(card_vbt, &sty_card, 0);
-    lv_obj_set_size(card_vbt, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(card_vbt, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card_vbt, LV_FLEX_FLOW_COLUMN);
     create_card_title(card_vbt, "BOUT DE RAMPE");
     lv_obj_t *row_vbt = lv_obj_create(card_vbt);
