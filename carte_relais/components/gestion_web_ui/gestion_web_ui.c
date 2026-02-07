@@ -23,6 +23,7 @@
 #include "protocole_mqtt.h"
 #include "mqtt_topics.h"
 #include "gestion_configuration.h"
+#include "esp_timer.h"
 
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -38,6 +39,9 @@ static httpd_handle_t s_serveur = NULL;
 static etat_carte_avant_t   s_etat_avant = {0};
 static etat_carte_arriere_t s_etat_arriere = {0};
 static configuration_t      s_config_courante = CONFIG_DEFAUT;
+static int64_t s_derniere_maj_avant = 0;
+static int64_t s_derniere_maj_arriere = 0;
+static carte_id_t s_carte_master = CARTE_ID_AVANT;  /* Mis à jour au démarrage */
 
 /* ====================================================================
  * CSS COMMUN (adapté de common_ui.h)
@@ -193,7 +197,9 @@ static const char PAGE_PART2[] =
 "function refresh(){"
 "  fetch('/status').then(r=>r.json()).then(d=>{"
 "    var st=document.getElementById('status-tag');"
-"    st.className='online';st.innerText='SYSTEME CONNECTE';"
+"    var masterLbl=d.master=='AV'?'AV Master':'AR Master';"
+"    var otherLink=d.master=='AV'?(d.link_ar?'Link AR Actif':'Link AR Perdu'):(d.link_av?'Link AV Actif':'Link AV Perdu');"
+"    st.className='online';st.innerText=masterLbl+' / '+otherLink;"
 "    var alertBox=document.getElementById('av-empty-alert');"
 "    var pBtn=document.getElementById('p_btn');"
 "    if(d.av_ok&&d.av_vide){"
@@ -304,6 +310,11 @@ static esp_err_t handler_status(httpd_req_t *req)
     cJSON_AddNumberToObject(json, "niveau_ar", litres_ar);
     cJSON_AddNumberToObject(json, "niveau_ar_max", s_config_courante.volume_cuve_ar);
     cJSON_AddBoolToObject(json, "sonde_ok", s_etat_arriere.sonde_niveau_ok);
+    /* Info réseau */
+    int64_t now = esp_timer_get_time() / 1000;
+    cJSON_AddStringToObject(json, "master", s_carte_master == CARTE_ID_AVANT ? "AV" : "AR");
+    cJSON_AddBoolToObject(json, "link_av", (now - s_derniere_maj_avant) < 5000);
+    cJSON_AddBoolToObject(json, "link_ar", (now - s_derniere_maj_arriere) < 5000);
     char *str = cJSON_PrintUnformatted(json);
     cJSON_Delete(json);
 
@@ -545,10 +556,21 @@ void web_ui_arreter(void)
 
 void web_ui_update_etat_avant(const etat_carte_avant_t *etat)
 {
-    if (etat) s_etat_avant = *etat;
+    if (etat) {
+        s_etat_avant = *etat;
+        s_derniere_maj_avant = esp_timer_get_time() / 1000;
+    }
 }
 
 void web_ui_update_etat_arriere(const etat_carte_arriere_t *etat)
 {
-    if (etat) s_etat_arriere = *etat;
+    if (etat) {
+        s_etat_arriere = *etat;
+        s_derniere_maj_arriere = esp_timer_get_time() / 1000;
+    }
+}
+
+void web_ui_set_carte_master(carte_id_t id)
+{
+    s_carte_master = id;
 }

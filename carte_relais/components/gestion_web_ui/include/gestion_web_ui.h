@@ -33,7 +33,7 @@ void web_ui_arreter(void);
  */
 void web_ui_update_etat_avant(const etat_carte_avant_t *etat);
 void web_ui_update_etat_arriere(const etat_carte_arriere_t *etat);
-
+void web_ui_set_carte_master(carte_id_t id);
 #ifdef __cplusplus
 }
 #endif

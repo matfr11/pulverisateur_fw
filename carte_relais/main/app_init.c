@@ -264,6 +264,7 @@ void app_initialiser(void)
     /* 7. Démarrer le serveur Web UI (seulement si MASTER) */
     if (s_role == ROLE_MASTER) {
         web_ui_demarrer(&s_config);
+        web_ui_set_carte_master(ID_CARTE);
         ESP_LOGI(TAG, "Web UI démarrée (MASTER).");
     } else {
         ESP_LOGI(TAG, "Web UI non démarrée (SLAVE).");
@@ -338,6 +339,7 @@ void app_tache_principale(void *pvParameters)
             mqtt_initialiser(MQTT_BROKER_URI_MASTER, ID_CARTE);
 #if A_WEB_UI
             web_ui_demarrer(&s_config);
+            web_ui_set_carte_master(ID_CARTE);
             ESP_LOGI(TAG, "Web UI démarrée après failover.");
 #endif
         }
@@ -361,6 +363,7 @@ void app_tache_principale(void *pvParameters)
 #if A_WEB_UI
                 /* Démarrer la Web UI qui n'était pas active en tant que SLAVE */
                 web_ui_demarrer(&s_config);
+                web_ui_set_carte_master(ID_CARTE);
                 ESP_LOGI(TAG, "Web UI démarrée après failover.");
 #endif
             }
@@ -386,6 +389,11 @@ void app_tache_principale(void *pvParameters)
                     &etat_av.brassage_pourcentage);
 
                 mqtt_publier_etat_avant(&etat_av);
+                #if A_WEB_UI
+                    if (s_role == ROLE_MASTER) {
+                        web_ui_update_etat_avant(&etat_av);
+                    }
+                #endif
 #endif
 
 #ifdef CARTE_ARRIERE
@@ -398,6 +406,11 @@ void app_tache_principale(void *pvParameters)
                     .etat_systeme = s_etat_systeme,
                 };
                 mqtt_publier_etat_arriere(&etat_ar);
+                #if A_WEB_UI
+                    if (s_role == ROLE_MASTER) {
+                        web_ui_update_etat_arriere(&etat_ar);
+                    }
+                #endif
 #endif
             }
         }
