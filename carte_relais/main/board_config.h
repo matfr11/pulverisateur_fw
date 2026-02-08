@@ -28,7 +28,7 @@
 /* ====================================================================
  * MODE SIMULATION (décommenter pour activer)
  * ==================================================================== */
-#define MODE_SIMULATION  1
+//#define MODE_SIMULATION  1
 
 /* ====================================================================
  * CONFIGURATION GPIO - CARTE AVANT (4 relais)
@@ -106,8 +106,8 @@
     #define RELAIS_NIVEAU_ACTIF     1
 
     /* GPIO sonde niveau (ADC, entrée analogique 4-20mA) */
-    #define GPIO_SONDE_NIVEAU       GPIO_NUM_36
-    #define ADC_CANAL_SONDE         ADC_CHANNEL_0
+    #define GPIO_SONDE_NIVEAU       GPIO_NUM_34
+    #define ADC_CANAL_SONDE         ADC_CHANNEL_6
 
     /* Capacités */
     #define A_DEBITMETRE            0

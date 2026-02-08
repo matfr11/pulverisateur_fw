@@ -1,11 +1,12 @@
 {
     "idf.currentSetup": "C:\\Users\\destr\\esp\\v5.5.2\\esp-idf",
     "idf.flashType": "UART",
-    "idf.portWin": "COM4",
+    "idf.portWin": "COM3",
     "idf.openOcdConfigs": [
-        "board/esp32p4-ftdi.cfg"
+        "interface/ftdi/esp_ftdi.cfg",
+        "target/esp32.cfg"
     ],
     "idf.customExtraVars": {
-        "IDF_TARGET": "esp32p4"
+        "IDF_TARGET": "esp32"
     }
 }
