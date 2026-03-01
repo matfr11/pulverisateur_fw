@@ -6,10 +6,15 @@
 #define GESTION_CAPTEURS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int capteurs_sonde_get_debug_raw(void);
+float capteurs_sonde_get_debug_mv(void);
+void capteurs_sonde_set_config(uint32_t hauteur_sonde_mm, uint32_t offset_mm, uint32_t hauteur_cuve_mm);
 
 /* ====================================================================
  * INITIALISATION
@@ -52,6 +57,8 @@ float capteurs_sonde_get_niveau(void);
 
 /** Vérifie si la sonde est opérationnelle */
 bool capteurs_sonde_est_ok(void);
+
+
 
 #ifdef __cplusplus
 }

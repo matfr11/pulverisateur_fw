@@ -20,6 +20,7 @@
  * Les adaptations sont minimales côté frontend : seuls les endpoints changent.
  */
 #include "gestion_web_ui.h"
+#include "gestion_capteurs.h"
 #include "protocole_mqtt.h"
 #include "mqtt_topics.h"
 #include "gestion_configuration.h"
@@ -68,7 +69,7 @@ static const char CSS_COMMUN[] =
 "width:100%;padding-bottom:3px}"
 ".control-card{background:#262626;border-radius:10px;padding:6px 8px;"
 "margin-bottom:6px;border:1px solid #383838}"
-".card-title{font-size:.65rem;color:#777;margin-bottom:3px;text-transform:uppercase;"
+".card-title{font-size:.65rem;color:#ffffff;margin-bottom:3px;text-transform:uppercase;"
 "text-align:center}"
 ".h-gauge-container{width:100%;height:20px;background:#000;border-radius:5px;"
 "border:1px solid #444;position:relative;overflow:hidden;margin-bottom:4px}"
@@ -79,7 +80,7 @@ static const char CSS_COMMUN[] =
 "color:#eee;font-weight:bold;cursor:pointer;margin-bottom:4px;font-size:.8rem}"
 ".btn-group{display:flex;gap:4px;background:#121212;padding:3px;border-radius:6px}"
 ".btn-v{flex:1;padding:12px 2px;border:none;border-radius:4px;background:#333;"
-"color:#666;font-weight:bold;cursor:pointer;font-size:.75rem}"
+"color:#ffffff;font-weight:bold;cursor:pointer;font-size:.75rem}"
 ".active-green{background:#2ecc71!important;color:white!important}"
 ".active-red{background:#e74c3c!important;color:white!important}"
 ".active-blue{background:#39f!important;color:white!important}"
@@ -298,6 +299,9 @@ static esp_err_t handler_status(httpd_req_t *req)
     cJSON_AddNumberToObject(json, "br_rem", s_etat_avant.brassage_temps_restant);
     cJSON_AddNumberToObject(json, "br_pct", s_etat_avant.brassage_pourcentage);
 
+    cJSON_AddNumberToObject(json, "dbg_raw", capteurs_sonde_get_debug_raw());
+    cJSON_AddNumberToObject(json, "dbg_mv", capteurs_sonde_get_debug_mv());
+
     /* État carte ARRIÈRE */
     const char *map_vanne[] = {"?", "O", "F", "S", "T"};
     int idx_v2m = (int)s_etat_arriere.vanne_2m;
@@ -411,6 +415,8 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "<input type='number' id='s_hmax' value='%u'></div>"
         "<div class='setting-row'><label>Offset sonde <span class='unit'>(mm)</span></label>"
         "<input type='number' id='s_off' value='%u'></div></div>"
+        "<div class='setting-row'><label>Hauteur cuve <span class='unit'>(mm)</span></label>"
+        "<input type='number' id='h_cuve' value='%u'></div>"
         "<h2>MISE &Agrave; JOUR FIRMWARE</h2>"
         "<div class='control-card'>"
         "<div class='setting-row'>"
@@ -463,7 +469,8 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "    temps_off:+document.getElementById('br_off').value,"
         "    volume_cuve_ar:+document.getElementById('vol_ar').value,"
         "    sonde_hauteur_max:+document.getElementById('s_hmax').value,"
-        "    sonde_offset:+document.getElementById('s_off').value"
+        "    sonde_offset:+document.getElementById('s_off').value,"
+        "    hauteur_cuve:+document.getElementById('h_cuve').value"
         "  };"
         "  fetch('/api/save_config',{method:'POST',"
         "    headers:{'Content-Type':'application/json'},"
@@ -482,7 +489,8 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         (unsigned)s_config_courante.temps_brassage_off,
         (unsigned)s_config_courante.volume_cuve_ar,
         (unsigned)s_config_courante.sonde_hauteur_max_mm,
-        (unsigned)s_config_courante.sonde_offset_mm
+        (unsigned)s_config_courante.sonde_offset_mm,
+        (unsigned)s_config_courante.hauteur_cuve_mm
     );
 
     httpd_resp_set_type(req, "text/html");
@@ -529,7 +537,8 @@ static esp_err_t handler_save_config(httpd_req_t *req)
     if (item) s_config_courante.sonde_hauteur_max_mm = item->valueint;
     item = cJSON_GetObjectItem(json, "sonde_offset");
     if (item) s_config_courante.sonde_offset_mm = item->valueint;
-
+    item = cJSON_GetObjectItem(json, "hauteur_cuve");
+    if (item) s_config_courante.hauteur_cuve_mm = item->valueint;
     cJSON_Delete(json);
 
     /* Incrémenter la version */

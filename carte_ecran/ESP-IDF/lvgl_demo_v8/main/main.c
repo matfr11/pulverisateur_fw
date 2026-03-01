@@ -62,6 +62,10 @@ static void on_ui_save_config(const configuration_t *cfg)
     ESP_LOGI(TAG, "Config modifiée depuis l'écran, publication MQTT.");
     s_config = *cfg;
     mqtt_publier_mise_a_jour_config(cfg);
+    /* Recharger dans l'UI pour confirmer */
+    bsp_display_lock(0);
+    ecran_ui_set_config(&s_config);
+    bsp_display_unlock();
 }
 
 /* ====================================================================
@@ -149,7 +153,12 @@ static void tache_ecran(void *arg)
         ecran_ui_update_reseau("AV", link_av, link_ar);
 
         /* Rafraîchir la config si elle a changé */
-        ecran_ui_set_config(&s_config);
+        /* Config chargée une seule fois après connexion MQTT */
+        static bool config_chargee = false;
+        if (!config_chargee && mqtt_est_connecte()) {
+            ecran_ui_set_config(&s_config);
+            config_chargee = true;
+        }
 
         bsp_display_unlock();
     }

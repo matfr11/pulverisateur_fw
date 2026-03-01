@@ -339,6 +339,7 @@ int json_serialiser_configuration(const configuration_t *config, char *buffer, s
     cJSON_AddNumberToObject(cuve, "volume_total", config->volume_cuve_ar);
     cJSON_AddNumberToObject(cuve, "hauteur_max", config->sonde_hauteur_max_mm);
     cJSON_AddNumberToObject(cuve, "offset", config->sonde_offset_mm);
+    cJSON_AddNumberToObject(cuve, "hauteur_cuve", config->hauteur_cuve_mm);
 
     char *str = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
@@ -401,6 +402,8 @@ bool json_deserialiser_configuration(const char *json_str, configuration_t *conf
         if (item) config_out->sonde_hauteur_max_mm = item->valueint;
         item = cJSON_GetObjectItem(cuve, "offset");
         if (item) config_out->sonde_offset_mm = item->valueint;
+        item = cJSON_GetObjectItem(cuve, "hauteur_cuve");
+        if (item) config_out->hauteur_cuve_mm = item->valueint;
     }
     config_out->version_protocole = VERSION_PROTOCOLE;
 

@@ -14,8 +14,8 @@
 /* ====================================================================
  * SÉLECTION DE LA CARTE (décommenter UNE seule ligne)
  * ==================================================================== */
-//#define CARTE_AVANT      1
-#define CARTE_ARRIERE    1
+#define CARTE_AVANT      1
+//#define CARTE_ARRIERE    1
 
 /* Vérification qu'une seule carte est sélectionnée */
 #if defined(CARTE_AVANT) && defined(CARTE_ARRIERE)

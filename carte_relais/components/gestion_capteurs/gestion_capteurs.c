@@ -8,6 +8,7 @@
 #include "driver/gpio.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
+#include "esp_adc/adc_cali_scheme.h"
 
 #ifdef CARTE_ARRIERE
 #include "esp_adc/adc_oneshot.h"
@@ -156,6 +157,26 @@ void capteurs_debitmetre_set_facteur_k(float k) { (void)k; }
 static float s_niveau_pct = 0.0f;
 static bool  s_sonde_ok = false;
 
+static int s_sonde_debug_raw = -1;       /* Dernière valeur ADC brute */
+static float s_sonde_debug_mv = -1.0f;   /* Dernière tension en mV */
+static uint32_t s_hauteur_sonde_mm = 2000;
+static uint32_t s_offset_mm = 0;
+static uint32_t s_hauteur_cuve_mm = 1550;
+
+#define SONDE_NB_ECHANTILLONS   100   /* 100 lectures × 100ms = 10 secondes */
+static float s_sonde_buffer[SONDE_NB_ECHANTILLONS] = {0};
+static int   s_sonde_idx = 0;
+static int   s_sonde_count = 0;       /* Nombre d'échantillons valides */
+
+void capteurs_sonde_set_config(uint32_t hauteur_sonde_mm, uint32_t offset_mm, uint32_t hauteur_cuve_mm)
+{
+    s_hauteur_sonde_mm = hauteur_sonde_mm;
+    s_offset_mm = offset_mm;
+    s_hauteur_cuve_mm = hauteur_cuve_mm;
+    ESP_LOGI(TAG, "Sonde config: sonde=%lumm offset=%lumm cuve=%lumm",
+             (unsigned long)s_hauteur_sonde_mm, (unsigned long)s_offset_mm, (unsigned long)s_hauteur_cuve_mm);
+}
+
 #ifndef MODE_SIMULATION
 static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 #endif
@@ -164,6 +185,8 @@ static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 #define TENSION_4MA_MV    600   /* 4mA × 150Ω = 0.6V */
 #define TENSION_20MA_MV   3000  /* 20mA × 150Ω = 3.0V */
 
+static adc_cali_handle_t s_adc_cali = NULL;
+
 static void sonde_niveau_init(void)
 {
 #ifndef MODE_SIMULATION
@@ -171,12 +194,19 @@ static void sonde_niveau_init(void)
         .unit_id = ADC_UNIT_1,
     };
     adc_oneshot_new_unit(&init_cfg, &s_adc_handle);
-
     adc_oneshot_chan_cfg_t chan_cfg = {
         .atten = ADC_ATTEN_DB_12,
         .bitwidth = ADC_BITWIDTH_12,
     };
     adc_oneshot_config_channel(s_adc_handle, ADC_CANAL_SONDE, &chan_cfg);
+
+    /* Calibration ADC pour corriger la non-linéarité */
+    adc_cali_line_fitting_config_t cali_cfg = {
+        .unit_id = ADC_UNIT_1,
+        .atten = ADC_ATTEN_DB_12,
+        .bitwidth = ADC_BITWIDTH_12,
+    };
+    adc_cali_create_scheme_line_fitting(&cali_cfg, &s_adc_cali);
 #endif
     s_sonde_ok = true;
     ESP_LOGI(TAG, "Sonde de niveau initialisée.");
@@ -185,48 +215,70 @@ static void sonde_niveau_init(void)
 void capteurs_sonde_niveau_update(void)
 {
 #ifdef MODE_SIMULATION
-    s_niveau_pct = 65.0f; /* Valeur fictive */
+    s_niveau_pct = 65.0f;
     s_sonde_ok = true;
     return;
 #endif
-
 #ifndef MODE_SIMULATION
     if (!s_adc_handle) return;
-
     int raw = 0;
     esp_err_t ret = adc_oneshot_read(s_adc_handle, ADC_CANAL_SONDE, &raw);
+    s_sonde_debug_raw = (ret == ESP_OK) ? raw : -99;
     if (ret != ESP_OK) {
         s_sonde_ok = false;
         return;
     }
+    /* Conversion calibrée raw → mV */
+    int mv = 0;
+    if (s_adc_cali) {
+        adc_cali_raw_to_voltage(s_adc_cali, raw, &mv);
+    } else {
+        mv = (int)((float)raw * 3300.0f / 4095.0f);
+    }
+    float tension_mv = (float)mv;
+    s_sonde_debug_mv = tension_mv;
+    /* Conversion mV → mm de colonne d'eau */
+    float mm_eau = (tension_mv - TENSION_4MA_MV) * (float)s_hauteur_sonde_mm / (TENSION_20MA_MV - TENSION_4MA_MV);
+    if (mm_eau < 0.0f) mm_eau = 0.0f;
+    /* Appliquer l'offset et convertir en % de la cuve */
+    float mm_utile = mm_eau - (float)s_offset_mm;
+    if (mm_utile < 0.0f) mm_utile = 0.0f;
 
-    /* Conversion brute → mV (approximation linéaire avec atténuation 11dB) */
-    /* Pour une calibration précise, utiliser adc_cali */
-    float tension_mv = (float)raw * 3300.0f / 4095.0f;
-
-    /* Conversion mV → pourcentage */
     if (tension_mv < TENSION_4MA_MV - 100) {
-        /* Tension trop basse : sonde déconnectée ou < 4mA */
         s_sonde_ok = false;
         s_niveau_pct = 0.0f;
     } else {
         s_sonde_ok = true;
-        float pct = (tension_mv - TENSION_4MA_MV) * 100.0f / (TENSION_20MA_MV - TENSION_4MA_MV);
+        float pct = (s_hauteur_cuve_mm > 0) ? (mm_utile / (float)s_hauteur_cuve_mm * 100.0f) : 0.0f;
         if (pct < 0.0f) pct = 0.0f;
         if (pct > 100.0f) pct = 100.0f;
-        s_niveau_pct = pct;
+
+        /* Moyennage glissant */
+        s_sonde_buffer[s_sonde_idx] = pct;
+        s_sonde_idx = (s_sonde_idx + 1) % SONDE_NB_ECHANTILLONS;
+        if (s_sonde_count < SONDE_NB_ECHANTILLONS) s_sonde_count++;
+
+        float somme = 0.0f;
+        for (int i = 0; i < s_sonde_count; i++) {
+            somme += s_sonde_buffer[i];
+        }
+        s_niveau_pct = somme / (float)s_sonde_count;
     }
 #endif
 }
 
 float capteurs_sonde_get_niveau(void) { return s_niveau_pct; }
 bool capteurs_sonde_est_ok(void) { return s_sonde_ok; }
+int capteurs_sonde_get_debug_raw(void) { return s_sonde_debug_raw; }
+float capteurs_sonde_get_debug_mv(void) { return s_sonde_debug_mv; }
 
 #else
 /* Stubs pour la carte avant */
 void capteurs_sonde_niveau_update(void) {}
 float capteurs_sonde_get_niveau(void) { return 0.0f; }
 bool capteurs_sonde_est_ok(void) { return false; }
+int capteurs_sonde_get_debug_raw(void) { return -1; }
+float capteurs_sonde_get_debug_mv(void) { return -1.0f; }
 #endif /* A_SONDE_NIVEAU */
 
 /* ====================================================================

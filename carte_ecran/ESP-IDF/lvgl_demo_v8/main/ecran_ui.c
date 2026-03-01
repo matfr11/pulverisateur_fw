@@ -114,7 +114,7 @@ static lv_obj_t *s_lbl_phare_ar = NULL;
 /* ====================================================================
  * WIDGETS — SETTINGS
  * ==================================================================== */
-#define NB_SETTINGS 10
+#define NB_SETTINGS 11
 static lv_obj_t *s_spinbox[NB_SETTINGS] = {NULL};
 static configuration_t s_cfg_edit;  /* Copie de travail */
 
@@ -205,7 +205,7 @@ static lv_obj_t *create_card_title(lv_obj_t *parent, const char *text)
     lv_label_set_text(lbl, text);
     lv_obj_set_width(lbl, lv_pct(100));
     lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(lbl, COL_TEXT_DIM, 0);
+    lv_obj_set_style_text_color(lbl, COL_WHITE, 0);
     lv_obj_set_style_text_font(lbl, &lv_font_montserrat_12, 0);
     return lbl;
 }
@@ -279,7 +279,7 @@ static lv_obj_t *create_btn_vanne(lv_obj_t *parent, const char *text,
     lv_label_set_text(lbl, text);
     lv_obj_center(lbl);
     lv_obj_set_style_text_font(lbl, &lv_font_montserrat_14, 0);
-    lv_obj_set_style_text_color(lbl, lv_color_hex(0x666666), 0);
+    lv_obj_set_style_text_color(lbl, COL_WHITE, 0);
 
     return btn;
 }
@@ -360,6 +360,7 @@ static void evt_cmd(lv_event_t *e)
             s_cfg_edit.volume_cuve_ar          = lv_spinbox_get_value(s_spinbox[7]);
             s_cfg_edit.sonde_hauteur_max_mm    = lv_spinbox_get_value(s_spinbox[8]);
             s_cfg_edit.sonde_offset_mm         = lv_spinbox_get_value(s_spinbox[9]);
+            s_cfg_edit.hauteur_cuve_mm         = lv_spinbox_get_value(s_spinbox[10]);
             s_save_cb(&s_cfg_edit);
             ESP_LOGI(TAG, "Configuration sauvegardée.");
         }
@@ -640,6 +641,7 @@ static const setting_def_t s_settings_def[NB_SETTINGS] = {
     { "Volume cuve AR",         "L",      50,   9999, 50,  4, 0 },
     { "Hauteur max sonde",      "mm",    100,   5000, 50,  4, 0 },
     { "Offset sonde",           "mm",      0,   1000, 10,  4, 0 },
+    { "Hauteur cuve",           "mm",    500,   3000, 50,  4, 0 },
 };
 
 static void create_settings_screen(void)
@@ -963,4 +965,5 @@ void ecran_ui_set_config(const configuration_t *cfg)
     if (s_spinbox[7]) lv_spinbox_set_value(s_spinbox[7], cfg->volume_cuve_ar);
     if (s_spinbox[8]) lv_spinbox_set_value(s_spinbox[8], cfg->sonde_hauteur_max_mm);
     if (s_spinbox[9]) lv_spinbox_set_value(s_spinbox[9], cfg->sonde_offset_mm);
+    if (s_spinbox[10]) lv_spinbox_set_value(s_spinbox[10], cfg->hauteur_cuve_mm);
 }

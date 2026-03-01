@@ -144,6 +144,13 @@ static void on_configuration_recue(const configuration_t *config)
         /* Mettre à jour le facteur K du débitmètre */
         capteurs_debitmetre_set_facteur_k(s_config.facteur_k_debitmetre);
 #endif
+#if A_SONDE_NIVEAU
+        capteurs_sonde_set_config(
+            s_config.sonde_hauteur_max_mm,
+            s_config.sonde_offset_mm,
+            s_config.hauteur_cuve_mm
+        );
+#endif
     }
 }
 
@@ -209,6 +216,14 @@ void app_initialiser(void)
     /* Laisser la priorité à la carte AVANT pour devenir MASTER */
     ESP_LOGI(TAG, "Carte ARRIÈRE : attente 4s avant scan réseau...");
     vTaskDelay(pdMS_TO_TICKS(4000));
+    #endif
+
+    #if A_SONDE_NIVEAU
+    capteurs_sonde_set_config(
+        s_config.sonde_hauteur_max_mm,
+        s_config.sonde_offset_mm,
+        s_config.hauteur_cuve_mm
+    );
     #endif
 
     /* 4. Démarrer WiFi et déterminer le rôle */
