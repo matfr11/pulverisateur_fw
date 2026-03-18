@@ -202,7 +202,7 @@ typedef struct {
     .temps_brassage_off     = 300, \
     .facteur_k_debitmetre   = 4.72f, \
     .timeout_vanne_ms       = 30000, \
-    .volume_cuve_ar         = 1000, \
+    .volume_cuve_ar         = 12500, \
     .sonde_hauteur_max_mm   = 2000, \
     .sonde_offset_mm        = 0, \
     .hauteur_cuve_mm        = 1550, \

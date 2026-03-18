@@ -55,7 +55,7 @@
     #define RELAIS_NIVEAU_ACTIF     1
 
     /* GPIO du débitmètre (entrée impulsions) */
-    #define GPIO_DEBITMETRE         GPIO_NUM_16
+    #define GPIO_DEBITMETRE         GPIO_NUM_13
 
     /* Pas de vannes motorisées sur la carte avant */
     #define A_DEBITMETRE            1

@@ -206,7 +206,7 @@ static lv_obj_t *create_card_title(lv_obj_t *parent, const char *text)
     lv_obj_set_width(lbl, lv_pct(100));
     lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(lbl, COL_WHITE, 0);
-    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_12, 0);
+    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_16, 0);
     return lbl;
 }
 
@@ -351,8 +351,8 @@ static void evt_cmd(lv_event_t *e)
         if (s_save_cb) {
             /* Lire les spinbox dans la config */
             s_cfg_edit.volume_transfert       = lv_spinbox_get_value(s_spinbox[0]);
-            s_cfg_edit.facteur_k_debitmetre   = (float)lv_spinbox_get_value(s_spinbox[1]) / 100.0f;
-            s_cfg_edit.seuil_debit_cuve_vide  = (float)lv_spinbox_get_value(s_spinbox[2]) / 10.0f;
+            s_cfg_edit.facteur_k_debitmetre   = (float)lv_spinbox_get_value(s_spinbox[1]); 
+            s_cfg_edit.seuil_debit_cuve_vide  = (float)lv_spinbox_get_value(s_spinbox[2]); 
             s_cfg_edit.delai_detection_ms      = lv_spinbox_get_value(s_spinbox[3]) * 1000;
             s_cfg_edit.timeout_vanne_ms        = lv_spinbox_get_value(s_spinbox[4]) * 1000;
             s_cfg_edit.temps_brassage_on       = lv_spinbox_get_value(s_spinbox[5]);
@@ -632,8 +632,8 @@ typedef struct {
 
 static const setting_def_t s_settings_def[NB_SETTINGS] = {
     { "Volume transfert",       "L",       1,   9999, 10,  4, 0 },
-    { "Facteur K debitmetre",   "x100",    1,   9999,  1,  4, 0 },  /* stocké ×100 */
-    { "Seuil mini debit",       "x10 L/m", 1,    999,  1,  3, 0 },  /* stocké ×10 */
+    { "Facteur K debitmetre",   "imp/L",   1,   9999,  1,  4, 0 },
+    { "Seuil mini debit",       "L/m",     1,    999,  1,  3, 0 },
     { "Delai coupure",          "sec",     1,     60,  1,  2, 0 },
     { "Timeout vannes",         "sec",     5,    120,  5,  3, 0 },
     { "Brassage ON",            "sec",    10,   3600, 10,  4, 0 },
@@ -956,8 +956,8 @@ void ecran_ui_set_config(const configuration_t *cfg)
     s_cfg_edit = *cfg;
 
     if (s_spinbox[0]) lv_spinbox_set_value(s_spinbox[0], cfg->volume_transfert);
-    if (s_spinbox[1]) lv_spinbox_set_value(s_spinbox[1], (int32_t)(cfg->facteur_k_debitmetre * 100.0f));
-    if (s_spinbox[2]) lv_spinbox_set_value(s_spinbox[2], (int32_t)(cfg->seuil_debit_cuve_vide * 10.0f));
+    if (s_spinbox[1]) lv_spinbox_set_value(s_spinbox[1], (int32_t)(cfg->facteur_k_debitmetre));
+    if (s_spinbox[2]) lv_spinbox_set_value(s_spinbox[2], (int32_t)(cfg->seuil_debit_cuve_vide));
     if (s_spinbox[3]) lv_spinbox_set_value(s_spinbox[3], cfg->delai_detection_ms / 1000);
     if (s_spinbox[4]) lv_spinbox_set_value(s_spinbox[4], cfg->timeout_vanne_ms / 1000);
     if (s_spinbox[5]) lv_spinbox_set_value(s_spinbox[5], cfg->temps_brassage_on);
