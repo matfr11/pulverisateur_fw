@@ -98,6 +98,22 @@ static const char CSS_COMMUN[] =
 ".slide:nth-child(2){flex:1 1 20%;min-width:180px;background:#151515!important}"
 ".slide:nth-child(2) .btn-full{font-size:.7rem;padding:10px 5px}"
 "h2{font-size:.85rem;margin-bottom:5px}}"
+"@media(min-width:768px){"
+".top-bar{height:48px}"
+"#status-tag{font-size:.9rem;padding:5px 12px}"
+".ver-info{font-size:.75rem}"
+".settings-icon{font-size:1.5rem}"
+"h2{font-size:1.4rem;margin:8px 0 14px 0;padding-bottom:6px}"
+".card-title{font-size:1rem}"
+".h-gauge-container{height:36px;margin-bottom:8px}"
+".h-gauge-text{line-height:36px;font-size:1.15rem}"
+".btn-full{padding:22px;margin-bottom:8px;font-size:1.15rem}"
+".btn-v{padding:20px 4px;font-size:1rem}"
+".control-card{padding:10px 12px;margin-bottom:10px}"
+".slide{padding:12px!important}"
+".slide:nth-child(1),.slide:nth-child(3){flex:3 1 35%}"
+".slide:nth-child(2){flex:2 1 30%;min-width:240px}"
+".slide:nth-child(2) .btn-full{font-size:1.05rem;padding:20px 10px}}"
 "</style>";
 
 /* ====================================================================

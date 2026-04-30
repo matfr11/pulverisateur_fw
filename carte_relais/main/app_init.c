@@ -131,7 +131,7 @@ static void on_configuration_recue(const configuration_t *config)
     ESP_LOGI(TAG, "Configuration reçue (version %lu)", (unsigned long)config->version);
 
     /* Si version plus récente, appliquer */
-    if (config->version > s_config.version) {
+    if (config->version >= s_config.version) {
         s_config = *config;
         configuration_sauvegarder(&s_config);
 
