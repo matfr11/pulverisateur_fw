@@ -1,24 +1,8 @@
 # Exclut TOUS les dossiers build et managed_components du dépôt
 **/build/
 **/managed_components/
-**/dependencies.lock* . z i p 
-# --- TRÈS IMPORTANT : ON GARDE CES COMPOSANTS LOCAUX ---
-# !carte_ecran/ESP-IDF/lvgl_demo_v8/components/bsp_extra/
-# !carte_ecran/ESP-IDF/lvgl_demo_v8/components/espressif__esp32_p4_function_ev_board/
-
-# --- ON IGNORE TOUT LE RESTE ---
-carte_ecran/ESP-IDF/*
-!carte_ecran/ESP-IDF/lvgl_demo_v8/
-
-# On ignore les dossiers de compilation et de téléchargement automatique
-**/build/
-**/managed_components/
 **/dependencies.lock
 
-# On ignore les composants "Brookesia" et "Cam" qui sont trop lourds
-carte_ecran/components/espressif__esp-brookesia/
-carte_ecran/components/espressif__esp_cam_sensor/
-
-# On ignore les archives (le ZIP qui bloque tout)
+# On ignore les archives
 *.zip
 *.rar

@@ -65,9 +65,6 @@ pulverisateur_fw/
 │       ├── gestion_configuration/   # NVS, paramètres JSON
 │       └── gestion_web_ui/          # Serveur HTTP + pages HTML
 │
-├── carte_ecran/                     # Projet ESP32-P4-C6 (futur)
-│   └── ...
-│
 └── tools/scripts/
 ```
 
@@ -202,5 +199,4 @@ idf.py monitor
 2. ✅ Écrire le code commun (types, MQTT)
 3. ✅ Écrire les composants carte_relais
 4. ✅ Adapter la Web UI existante
-5. 🔲 Intégrer l'écran ESP32-P4-C6 avec LVGL (phase 2)
-6. 🔲 Tests terrain
+5. 🔲 Tests terrain

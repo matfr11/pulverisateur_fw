@@ -24,7 +24,6 @@ extern "C" {
  * ==================================================================== */
 #define TOPIC_ETAT_AVANT                MQTT_PREFIXE "/etat/avant"
 #define TOPIC_ETAT_ARRIERE              MQTT_PREFIXE "/etat/arriere"
-#define TOPIC_ETAT_ECRAN                MQTT_PREFIXE "/etat/ecran"
 
 /* ====================================================================
  * COMMANDES (publiées par les interfaces, retain=false, QoS 1)

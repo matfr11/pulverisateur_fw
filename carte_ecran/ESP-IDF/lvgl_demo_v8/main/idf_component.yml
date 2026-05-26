@@ -1,7 +1,0 @@
-dependencies:
-  lvgl/lvgl:
-    version: "8.4.*"
-    public: true
-  esp_lcd_jd9165: '*'
-  espressif/esp_wifi_remote:
-    version: "*"

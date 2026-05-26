@@ -7,7 +7,7 @@
 			"path": "../commun"
 		},
 		{
-			"path": "../carte_ecran"
+			"path": "../carte_serveur"
 		}
 	],
 	"settings": {}

@@ -3,7 +3,7 @@
  * @brief Types, structures, enums et constantes partagés par toutes les cartes.
  *
  * Ce fichier est LA RÉFÉRENCE pour toutes les définitions de données du système.
- * Il est inclus par le code commun, les cartes relais et la carte écran.
+ * Il est inclus par le code commun, les cartes relais et la carte serveur.
  */
 #ifndef TYPES_PULVERISATEUR_H
 #define TYPES_PULVERISATEUR_H
@@ -19,15 +19,16 @@ extern "C" {
  * VERSION DU PROTOCOLE
  * ==================================================================== */
 #define VERSION_PROTOCOLE       1
+#ifndef VERSION_FIRMWARE
 #define VERSION_FIRMWARE        "3.0.0"
-
+#endif
 /* ====================================================================
  * IDENTIFICATION DES CARTES
  * ==================================================================== */
 typedef enum {
     CARTE_ID_AVANT   = 0x01,
     CARTE_ID_ARRIERE = 0x02,
-    CARTE_ID_ECRAN   = 0x03,
+    CARTE_ID_SERVEUR = 0x04,
 } carte_id_t;
 
 /* ====================================================================
