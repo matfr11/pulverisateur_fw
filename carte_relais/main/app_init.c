@@ -8,10 +8,17 @@
 #include "protocole_mqtt.h"
 #include "broker_mqtt.h"
 #include "mqtt_topics.h"
-#include "gestion_actionneurs.h"
-#include "gestion_capteurs.h"
 #include "gestion_configuration.h"
 #include "nvs_flash.h"
+
+/*
+ * La carte serveur n'a pas de relais ni de capteurs physiques.
+ * On n'inclut ces modules que pour les cartes relais.
+ */
+#if !A_EST_SERVEUR
+#include "gestion_actionneurs.h"
+#include "gestion_capteurs.h"
+#endif
 
 #if A_DEBITMETRE
 #include "gestion_automatismes.h"
@@ -45,6 +52,12 @@ static uint32_t             s_compteur_publication = 0;
 /* ====================================================================
  * CALLBACKS MQTT
  * ==================================================================== */
+
+/*
+ * Le serveur envoie des commandes aux cartes relais, il n'en reçoit pas
+ * (il n'a pas d'actionneurs). Ce callback n'est compilé que pour les relais.
+ */
+#if !A_EST_SERVEUR
 
 /** Callback de réception de commandes MQTT */
 static void on_commande_recue(const char *topic, const char *payload, int len)
@@ -125,31 +138,66 @@ static void on_commande_recue(const char *topic, const char *payload, int len)
     cJSON_Delete(json);
 }
 
-/** Callback de réception de configuration MQTT */
+#endif /* !A_EST_SERVEUR */
+
+/**
+ * Callback déclenché à chaque réception d'un message MQTT de configuration.
+ *
+ * Ce callback est appelé sur TOUTES les cartes (serveur et relais).
+ *
+ * Sur la carte serveur :
+ *   → La nouvelle config vient d'une modification via la Web UI.
+ *   → On la sauvegarde en NVS local (source de vérité) et on la redistribue
+ *     aux cartes relais pour qu'elles mettent à jour leur cache.
+ *
+ * Sur une carte relais :
+ *   → La config vient du serveur (au démarrage ou après une modification).
+ *   → On l'applique, on la sauvegarde en NVS local (cache de secours),
+ *     et si on était en attente de config, on passe en mode OPÉRATIONNEL.
+ */
 static void on_configuration_recue(const configuration_t *config)
 {
     ESP_LOGI(TAG, "Configuration reçue (version %lu)", (unsigned long)config->version);
 
-    /* Si version plus récente, appliquer */
+    /* On n'applique la config que si elle est plus récente que celle qu'on a */
     if (config->version >= s_config.version) {
         s_config = *config;
+
+        /* Sauvegarder en mémoire non-volatile */
         configuration_sauvegarder(&s_config);
 
-        /* Si MASTER, rediffuser */
-        if (s_role == ROLE_MASTER) {
-            mqtt_publier_configuration(&s_config);
-        }
+#if A_EST_SERVEUR
+        /*
+         * Le serveur est la source de vérité : quand sa config change
+         * (via la Web UI), il la redistribue à toutes les cartes relais.
+         */
+        mqtt_publier_configuration(&s_config);
+        ESP_LOGI(TAG, "Configuration mise à jour et redistribuée aux cartes relais.");
+#endif
 
 #if A_DEBITMETRE
-        /* Mettre à jour le facteur K du débitmètre */
+        /* Appliquer le nouveau facteur K au débitmètre */
         capteurs_debitmetre_set_facteur_k(s_config.facteur_k_debitmetre);
 #endif
 #if A_SONDE_NIVEAU
+        /* Appliquer les nouveaux paramètres de la sonde de niveau */
         capteurs_sonde_set_config(
             s_config.sonde_hauteur_max_mm,
             s_config.sonde_offset_mm,
             s_config.hauteur_cuve_mm
         );
+#endif
+
+#if !A_EST_SERVEUR
+        /*
+         * Pour les cartes relais : si on était en phase de synchronisation
+         * (attente de la config initiale du serveur au démarrage),
+         * on peut maintenant passer en mode opérationnel.
+         */
+        if (s_etat_systeme == ETAT_SYS_SYNCHRONISATION) {
+            s_etat_systeme = ETAT_SYS_OPERATIONNEL;
+            ESP_LOGI(TAG, "Config reçue du serveur → système OPÉRATIONNEL.");
+        }
 #endif
     }
 }
@@ -181,8 +229,10 @@ void app_initialiser(void)
     ESP_LOGI(TAG, " PULVERISATEUR AGRICOLE - %s",
 #ifdef CARTE_AVANT
              "CARTE AVANT"
-#else
+#elif defined(CARTE_ARRIERE)
              "CARTE ARRIERE"
+#else
+             "CARTE SERVEUR"
 #endif
     );
     ESP_LOGI(TAG, " Firmware %s | Protocole v%d", VERSION_FIRMWARE, VERSION_PROTOCOLE);
@@ -206,17 +256,19 @@ void app_initialiser(void)
         s_config = (configuration_t)CONFIG_DEFAUT;
     }
 
-    /* 2. Initialiser les actionneurs (GPIO) */
+    /*
+     * 2 & 3. Initialiser les actionneurs (relais GPIO) et les capteurs.
+     * La carte serveur n'a aucun matériel physique : on saute cette étape.
+     *
+     * Note : le délai de 4 secondes pour CARTE_ARRIERE n'est plus nécessaire.
+     * Dans l'ancienne architecture, la carte ARRIERE attendait que AVANT ait eu
+     * le temps de scanner le réseau et de devenir MASTER. Avec la carte serveur
+     * dédiée, les rôles sont fixes : cette attente n'a plus de sens.
+     */
+#if !A_EST_SERVEUR
     actionneurs_initialiser();
-
-    /* 3. Initialiser les capteurs */
     capteurs_initialiser();
-
-    #ifdef CARTE_ARRIERE
-    /* Laisser la priorité à la carte AVANT pour devenir MASTER */
-    ESP_LOGI(TAG, "Carte ARRIÈRE : attente 4s avant scan réseau...");
-    vTaskDelay(pdMS_TO_TICKS(4000));
-    #endif
+#endif
 
     #if A_SONDE_NIVEAU
     capteurs_sonde_set_config(
@@ -226,34 +278,54 @@ void app_initialiser(void)
     );
     #endif
 
-    /* 4. Démarrer WiFi et déterminer le rôle */
-    wifi_initialiser(&s_role);
-    ESP_LOGI(TAG, "Rôle réseau : %s", s_role == ROLE_MASTER ? "MASTER" : "SLAVE");
+    /*
+     * 4. Démarrer le WiFi.
+     * A_EST_SERVEUR est défini dans board_config.h :
+     *   - true (1) pour CARTE_SERVEUR → démarre en Point d'Accès (AP)
+     *   - false (0) pour CARTE_AVANT/ARRIERE → se connecte en client (STA)
+     * Le rôle est désormais fixe, il n'y a plus de négociation dynamique.
+     */
+    wifi_initialiser(&s_role, A_EST_SERVEUR);
+    ESP_LOGI(TAG, "Rôle réseau : %s", s_role == ROLE_MASTER ? "SERVEUR (MASTER)" : "RELAIS (SLAVE)");
 
-    /* 4b. Si MASTER, démarrer le broker MQTT embarqué */
-    if (s_role == ROLE_MASTER) {
-        broker_mqtt_config_t broker_cfg = { .port = 1883 };
+    /*
+     * 4b. Démarrer le broker MQTT embarqué (carte serveur uniquement).
+     *
+     * Le broker MQTT est le "hub" de communication : toutes les cartes
+     * (y compris le serveur lui-même) s'y connectent comme clients.
+     * Il doit être démarré avant la connexion du client MQTT local.
+     */
+#if A_EST_SERVEUR
+    {
+        broker_mqtt_config_t broker_cfg = { .port = MQTT_BROKER_PORT };
         esp_err_t err_broker = broker_mqtt_demarrer(&broker_cfg);
         if (err_broker != ESP_OK) {
             ESP_LOGE(TAG, "Échec démarrage broker MQTT !");
         } else {
-            ESP_LOGI(TAG, "Broker MQTT embarqué actif.");
-            /* Laisser le broker s'initialiser avant de connecter le client */
+            ESP_LOGI(TAG, "Broker MQTT démarré sur le port %d.", MQTT_PORT);
+            /* Petit délai pour que le broker soit prêt à accepter des connexions */
             vTaskDelay(pdMS_TO_TICKS(500));
         }
     }
+#endif
 
-    /* 5. Connexion MQTT (client) */
+    /* 5. Démarrer le client MQTT et enregistrer les callbacks */
     mqtt_initialiser(MQTT_BROKER_URI_MASTER, ID_CARTE);
+
+    /* Les cartes relais reçoivent et exécutent des commandes (pompe, vannes...) */
+#if !A_EST_SERVEUR
     mqtt_enregistrer_callback_commande(on_commande_recue);
+#endif
+
+    /* Toutes les cartes reçoivent les mises à jour de configuration */
     mqtt_enregistrer_callback_config(on_configuration_recue);
 
-#if A_WEB_UI
-    /* Si MASTER, enregistrer le callback d'état AVANT la connexion
-     * pour que la souscription se fasse dans le handler CONNECTED */
-    if (s_role == ROLE_MASTER) {
-        mqtt_enregistrer_callback_etat(on_etat_recu);
-    }
+    /*
+     * Le serveur reçoit les états MQTT des deux cartes relais
+     * pour alimenter sa Web UI en temps réel.
+     */
+#if A_EST_SERVEUR
+    mqtt_enregistrer_callback_etat(on_etat_recu);
 #endif
 
     /* Attendre la connexion MQTT (max 10s) */
@@ -262,28 +334,64 @@ void app_initialiser(void)
     }
 
     if (mqtt_est_connecte()) {
-        /* 6. Si MASTER, publier la configuration de référence */
-        if (s_role == ROLE_MASTER) {
-            mqtt_publier_configuration(&s_config);
-        } else {
-            /* SLAVE : demander la configuration */
-            mqtt_demander_configuration();
-        }
+
+#if A_EST_SERVEUR
+        /*
+         * 6a. CARTE SERVEUR : publier la configuration de référence avec retain=true.
+         *
+         * Toutes les cartes relais qui se connecteront (maintenant ou plus tard)
+         * recevront automatiquement ce message retenu et appliqueront la config.
+         * C'est le mécanisme qui remplace la demande explicite de config.
+         */
+        mqtt_publier_configuration(&s_config);
+        ESP_LOGI(TAG, "Configuration de référence publiée (version %lu).",
+                 (unsigned long)s_config.version);
         s_etat_systeme = ETAT_SYS_OPERATIONNEL;
+
+#else
+        /*
+         * 6b. CARTE RELAIS : envoyer une demande de configuration au serveur.
+         *
+         * On passe en SYNCHRONISATION : on attend que le serveur nous envoie
+         * sa configuration avant de se considérer pleinement opérationnel.
+         * La transition vers OPERATIONNEL se fait dans on_configuration_recue().
+         *
+         * Note : même si la carte relais a une config en NVS (d'un démarrage
+         * précédent), on attend la config du serveur pour s'assurer d'avoir
+         * la version la plus récente.
+         */
+        mqtt_demander_configuration();
+        s_etat_systeme = ETAT_SYS_SYNCHRONISATION;
+        ESP_LOGI(TAG, "Demande de config envoyée. En attente de réponse du serveur...");
+#endif
+
     } else {
-        ESP_LOGW(TAG, "MQTT non connecté. Mode dégradé.");
+
+#if A_EST_SERVEUR
+        /* Le broker local devrait toujours être joignable : c'est une erreur grave */
+        ESP_LOGE(TAG, "Impossible de se connecter au broker MQTT local !");
         s_etat_systeme = ETAT_SYS_DEGRADE;
+#else
+        /*
+         * Le serveur n'est pas encore joignable (normal si démarrage simultané).
+         * On reste en SYNCHRONISATION : la connexion MQTT se fera automatiquement
+         * quand le serveur sera disponible, et la config arrivera ensuite.
+         */
+        ESP_LOGW(TAG, "Serveur non joignable au démarrage. Synchronisation en attente...");
+        s_etat_systeme = ETAT_SYS_SYNCHRONISATION;
+#endif
     }
 
+    /*
+     * 7. Démarrer la Web UI (carte serveur uniquement).
+     *
+     * A_WEB_UI = 1 uniquement pour CARTE_SERVEUR (défini dans board_config.h).
+     * Pour les cartes relais, ce bloc est entièrement ignoré à la compilation.
+     */
 #if A_WEB_UI
-    /* 7. Démarrer le serveur Web UI (seulement si MASTER) */
-    if (s_role == ROLE_MASTER) {
-        web_ui_demarrer(&s_config);
-        web_ui_set_carte_master(ID_CARTE);
-        ESP_LOGI(TAG, "Web UI démarrée (MASTER).");
-    } else {
-        ESP_LOGI(TAG, "Web UI non démarrée (SLAVE).");
-    }
+    web_ui_demarrer(&s_config);
+    web_ui_set_carte_master(ID_CARTE);
+    ESP_LOGI(TAG, "Interface Web démarrée → http://192.168.4.1");
 #endif
 
 #if A_DEBITMETRE
@@ -335,53 +443,10 @@ void app_tache_principale(void *pvParameters)
         actionneurs_vannes_update_timeout(s_config.timeout_vanne_ms);
 #endif
 
-        /* --- Publication MQTT périodique --- */
-        /* --- Failover WiFi (exécuté dans la tâche principale, pas le timer) --- */
-        if (wifi_failover_est_demande()) {
-            wifi_failover_vers_master();
-
-            /* Arrêter l'ancien client MQTT (connecté à l'ancien master) */
-            /* Démarrer le broker si pas encore actif */
-            if (!broker_mqtt_est_actif()) {
-                broker_mqtt_config_t broker_cfg = { .port = 1883 };
-                broker_mqtt_demarrer(&broker_cfg);
-                vTaskDelay(pdMS_TO_TICKS(500));
-            }
-            s_role = ROLE_MASTER;
-#if A_WEB_UI
-            mqtt_enregistrer_callback_etat(on_etat_recu);
-#endif
-            mqtt_initialiser(MQTT_BROKER_URI_MASTER, ID_CARTE);
-#if A_WEB_UI
-            web_ui_demarrer(&s_config);
-            web_ui_set_carte_master(ID_CARTE);
-            ESP_LOGI(TAG, "Web UI démarrée après failover.");
-#endif
-        }
+        /* --- Publication MQTT périodique (toutes les INTERVALLE_PUBLICATION × 100ms) --- */
         s_compteur_publication++;
         if (s_compteur_publication >= INTERVALLE_PUBLICATION) {
             s_compteur_publication = 0;
-
-            /* Détecter failover : si on est devenu MASTER et le broker n'est pas actif */
-            if (wifi_obtenir_role() == ROLE_MASTER && !broker_mqtt_est_actif()) {
-                ESP_LOGW(TAG, "Failover détecté : démarrage du broker MQTT...");
-                broker_mqtt_config_t broker_cfg = { .port = 1883 };
-                broker_mqtt_demarrer(&broker_cfg);
-                s_role = ROLE_MASTER;
-                vTaskDelay(pdMS_TO_TICKS(500));
-#if A_WEB_UI
-                /* Enregistrer le callback d'état AVANT de reconnecter le client MQTT */
-                mqtt_enregistrer_callback_etat(on_etat_recu);
-#endif
-                /* Reconnecter le client MQTT au broker local */
-                mqtt_initialiser(MQTT_BROKER_URI_MASTER, ID_CARTE);
-#if A_WEB_UI
-                /* Démarrer la Web UI qui n'était pas active en tant que SLAVE */
-                web_ui_demarrer(&s_config);
-                web_ui_set_carte_master(ID_CARTE);
-                ESP_LOGI(TAG, "Web UI démarrée après failover.");
-#endif
-            }
 
             if (mqtt_est_connecte()) {
 #ifdef CARTE_AVANT
@@ -404,10 +469,9 @@ void app_tache_principale(void *pvParameters)
                     &etat_av.brassage_pourcentage);
 
                 mqtt_publier_etat_avant(&etat_av);
+                /* A_WEB_UI = 0 pour CARTE_AVANT → ce bloc est ignoré à la compilation */
                 #if A_WEB_UI
-                    if (s_role == ROLE_MASTER) {
-                        web_ui_update_etat_avant(&etat_av);
-                    }
+                    web_ui_update_etat_avant(&etat_av);
                 #endif
 #endif
 
@@ -421,10 +485,9 @@ void app_tache_principale(void *pvParameters)
                     .etat_systeme = s_etat_systeme,
                 };
                 mqtt_publier_etat_arriere(&etat_ar);
+                /* A_WEB_UI = 0 pour CARTE_ARRIERE → ce bloc est ignoré à la compilation */
                 #if A_WEB_UI
-                    if (s_role == ROLE_MASTER) {
-                        web_ui_update_etat_arriere(&etat_ar);
-                    }
+                    web_ui_update_etat_arriere(&etat_ar);
                 #endif
 #endif
             }

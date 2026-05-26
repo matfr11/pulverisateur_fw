@@ -1,6 +1,16 @@
 /**
  * @file protocole_wifi.c
- * @brief Implémentation WiFi AP/STA avec failover automatique.
+ * @brief Gestion WiFi : Point d'Accès pour le serveur, Client STA pour les relais.
+ *
+ * Cette version remplace l'ancien mécanisme master/slave dynamique.
+ * Les rôles sont maintenant fixes, déterminés au moment de la compilation
+ * par le paramètre est_serveur passé à wifi_initialiser().
+ *
+ * Différences avec l'ancienne version :
+ *   - Plus de scan réseau au démarrage (on sait déjà qui on est)
+ *   - Plus de failover (le serveur ne peut pas "devenir" esclave et vice versa)
+ *   - Plus de conflits au redémarrage simultané
+ *   - Reconnexion automatique simple pour les cartes relais (sans timer failover)
  */
 #include "protocole_wifi.h"
 #include "mqtt_topics.h"
@@ -9,10 +19,8 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
-#include "nvs_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
-#include "freertos/timers.h"
 #include "esp_mac.h"
 
 #include <string.h>
@@ -25,162 +33,137 @@ static const char *TAG = "WIFI";
 static role_reseau_t        s_role = ROLE_INDEFINI;
 static bool                 s_connecte = false;
 static EventGroupHandle_t   s_wifi_events = NULL;
-static TimerHandle_t        s_timer_failover = NULL;
 static esp_netif_t         *s_netif_ap = NULL;
 static esp_netif_t         *s_netif_sta = NULL;
 
-#define WIFI_BIT_CONNECTE       BIT0
-#define WIFI_BIT_DECONNECTE     BIT1
-#define WIFI_BIT_AP_DEMARRE     BIT2
+/* Bits d'événements pour la synchronisation de démarrage */
+#define WIFI_BIT_CONNECTE       BIT0   /* IP obtenue (mode STA) */
+#define WIFI_BIT_AP_DEMARRE     BIT1   /* Point d'accès actif (mode AP) */
+
+/*
+ * Stratégie de reconnexion pour les cartes relais :
+ *
+ *   Phase 1 : MAX_TENTATIVES_RAPIDES tentatives toutes les 2 secondes.
+ *             Couvre le cas où le serveur redémarre (reprend en ~5s).
+ *
+ *   Phase 2 : Tentatives toutes les 15 secondes jusqu'au retour du serveur.
+ *             Évite de saturer le réseau si le serveur est hors ligne.
+ */
+#define MAX_TENTATIVES_RAPIDES  5
 
 static int s_nb_tentatives_reconnexion = 0;
-static bool s_en_scan = false; 
-static volatile bool s_failover_demande = false; 
-
-#define MAX_TENTATIVES_RECONNEXION  5
 
 /* ====================================================================
  * PROTOTYPES INTERNES
  * ==================================================================== */
 static esp_err_t wifi_demarrer_ap(void);
 static esp_err_t wifi_demarrer_sta(void);
-static bool      wifi_scanner_reseau(void);
-static void      timer_failover_cb(TimerHandle_t timer);
 
 /* ====================================================================
  * HANDLER D'ÉVÉNEMENTS
+ *
+ * Appelé par ESP-IDF à chaque événement WiFi ou IP.
+ * Ne pas appeler directement.
  * ==================================================================== */
 void wifi_event_handler(void *arg, esp_event_base_t event_base,
                         int32_t event_id, void *event_data)
 {
     if (event_base == WIFI_EVENT) {
+
         switch (event_id) {
-                case WIFI_EVENT_STA_START:
-            if (!s_en_scan) {
-                ESP_LOGI(TAG, "STA démarré, connexion en cours...");
-                esp_wifi_connect();
-            }
+
+        case WIFI_EVENT_STA_START:
+            /*
+             * La carte relais vient d'activer son mode client WiFi.
+             * On tente immédiatement de rejoindre le réseau du serveur.
+             */
+            ESP_LOGI(TAG, "Mode client WiFi démarré. Connexion au serveur en cours...");
+            esp_wifi_connect();
             break;
 
         case WIFI_EVENT_STA_DISCONNECTED:
+            /*
+             * La carte relais a perdu la connexion avec le serveur.
+             * On tente de se reconnecter selon la stratégie définie :
+             *   - D'abord des tentatives rapides (serveur en train de redémarrer ?)
+             *   - Puis des tentatives espacées (serveur hors ligne)
+             */
             s_connecte = false;
-            xEventGroupSetBits(s_wifi_events, WIFI_BIT_DECONNECTE);
             xEventGroupClearBits(s_wifi_events, WIFI_BIT_CONNECTE);
 
             s_nb_tentatives_reconnexion++;
-            if (s_nb_tentatives_reconnexion < MAX_TENTATIVES_RECONNEXION) {
-                ESP_LOGW(TAG, "Déconnecté, tentative %d/%d...",
-                         s_nb_tentatives_reconnexion, MAX_TENTATIVES_RECONNEXION);
-                vTaskDelay(pdMS_TO_TICKS(1000));
+
+            if (s_nb_tentatives_reconnexion <= MAX_TENTATIVES_RAPIDES) {
+                /* Tentatives rapides : le serveur vient peut-être de redémarrer */
+                ESP_LOGW(TAG, "Connexion perdue. Tentative %d/%d dans 2s...",
+                         s_nb_tentatives_reconnexion, MAX_TENTATIVES_RAPIDES);
+                vTaskDelay(pdMS_TO_TICKS(2000));
                 esp_wifi_connect();
             } else {
-                ESP_LOGE(TAG, "Connexion perdue. Lancement failover dans %d ms.",
-                         WIFI_FAILOVER_TIMEOUT_MS);
-                /* Démarrer le timer de failover */
-                if (s_timer_failover) {
-                    xTimerStart(s_timer_failover, 0);
-                }
+                /*
+                 * Le serveur est probablement hors ligne.
+                 * On continue à chercher mais avec un délai plus long
+                 * pour ne pas surcharger inutilement le réseau.
+                 */
+                ESP_LOGW(TAG, "Serveur non joignable. Nouvelle tentative dans 15s...");
+                vTaskDelay(pdMS_TO_TICKS(15000));
+                /* On garde le compteur à MAX pour rester en phase 2 */
+                s_nb_tentatives_reconnexion = MAX_TENTATIVES_RAPIDES;
+                esp_wifi_connect();
             }
             break;
 
         case WIFI_EVENT_AP_STACONNECTED: {
+            /*
+             * Une carte relais vient de se connecter au point d'accès du serveur.
+             * (Événement sur la carte serveur uniquement)
+             */
             wifi_event_ap_staconnected_t *evt = (wifi_event_ap_staconnected_t *)event_data;
-            ESP_LOGI(TAG, "Station connectée au AP, MAC: " MACSTR, MAC2STR(evt->mac));
+            ESP_LOGI(TAG, "Carte relais connectée. MAC: " MACSTR, MAC2STR(evt->mac));
             break;
         }
 
         case WIFI_EVENT_AP_STADISCONNECTED: {
+            /*
+             * Une carte relais s'est déconnectée du point d'accès du serveur.
+             * (Événement sur la carte serveur uniquement)
+             */
             wifi_event_ap_stadisconnected_t *evt = (wifi_event_ap_stadisconnected_t *)event_data;
-            ESP_LOGW(TAG, "Station déconnectée du AP, MAC: " MACSTR, MAC2STR(evt->mac));
+            ESP_LOGW(TAG, "Carte relais déconnectée. MAC: " MACSTR, MAC2STR(evt->mac));
             break;
         }
 
         default:
             break;
         }
+
     } else if (event_base == IP_EVENT) {
+
         if (event_id == IP_EVENT_STA_GOT_IP) {
+            /*
+             * La carte relais a obtenu une adresse IP du serveur.
+             * La connexion WiFi est maintenant pleinement établie.
+             */
             ip_event_got_ip_t *evt = (ip_event_got_ip_t *)event_data;
-            ESP_LOGI(TAG, "IP obtenue : " IPSTR, IP2STR(&evt->ip_info.ip));
+            ESP_LOGI(TAG, "Connecté au serveur ! Adresse IP : " IPSTR,
+                     IP2STR(&evt->ip_info.ip));
+
             s_connecte = true;
-            s_nb_tentatives_reconnexion = 0;
+            s_nb_tentatives_reconnexion = 0;  /* Réinitialiser pour la prochaine fois */
             xEventGroupSetBits(s_wifi_events, WIFI_BIT_CONNECTE);
-            xEventGroupClearBits(s_wifi_events, WIFI_BIT_DECONNECTE);
-
-            /* Annuler le timer de failover si actif */
-            if (s_timer_failover) {
-                xTimerStop(s_timer_failover, 0);
-            }
         }
     }
 }
 
 /* ====================================================================
- * SCAN RÉSEAU
- * ==================================================================== */
-static bool wifi_scanner_reseau(void)
-{
-    ESP_LOGI(TAG, "Scan des réseaux WiFi...");
-
-    /* Initialisation temporaire en mode STA pour le scan */
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    s_en_scan = true;
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_start());
-
-    wifi_scan_config_t scan_cfg = {
-        .ssid = NULL,
-        .bssid = NULL,
-        .channel = 0,
-        .show_hidden = false,
-        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
-        .scan_time.active.min = 150,
-        .scan_time.active.max = 500,
-    };
-
-    esp_err_t err = esp_wifi_scan_start(&scan_cfg, true /* bloquant */);
-    if (err != ESP_OK) {
-        ESP_LOGW(TAG, "Erreur scan : %s", esp_err_to_name(err));
-        esp_wifi_stop();
-        esp_wifi_deinit();
-        return false;
-    }
-
-    uint16_t nb_resultats = 0;
-    esp_wifi_scan_get_ap_num(&nb_resultats);
-
-    bool trouve = false;
-    if (nb_resultats > 0) {
-        wifi_ap_record_t *resultats = malloc(nb_resultats * sizeof(wifi_ap_record_t));
-        if (resultats) {
-            esp_wifi_scan_get_ap_records(&nb_resultats, resultats);
-            for (int i = 0; i < nb_resultats; i++) {
-                if (strcmp((char *)resultats[i].ssid, WIFI_SSID_AP) == 0) {
-                    ESP_LOGI(TAG, "Réseau '%s' trouvé (RSSI: %d)", WIFI_SSID_AP, resultats[i].rssi);
-                    trouve = true;
-                    break;
-                }
-            }
-            free(resultats);
-        }
-    }
-    s_en_scan = false;
-    esp_wifi_stop();
-    esp_wifi_deinit();
-
-    if (!trouve) {
-        ESP_LOGI(TAG, "Réseau '%s' NON trouvé.", WIFI_SSID_AP);
-    }
-    return trouve;
-}
-
-/* ====================================================================
- * DÉMARRAGE MODE AP (MASTER)
+ * DÉMARRAGE EN MODE POINT D'ACCÈS - CARTE SERVEUR
+ *
+ * Crée le réseau WiFi auquel toutes les cartes relais se connecteront.
+ * L'adresse IP du serveur est fixe : 192.168.4.1 (valeur par défaut ESP-IDF).
  * ==================================================================== */
 static esp_err_t wifi_demarrer_ap(void)
 {
-    ESP_LOGI(TAG, "=== DÉMARRAGE EN MODE AP (MASTER) ===");
+    ESP_LOGI(TAG, "=== DÉMARRAGE EN MODE POINT D'ACCÈS (CARTE SERVEUR) ===");
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -189,31 +172,39 @@ static esp_err_t wifi_demarrer_ap(void)
 
     wifi_config_t ap_config = {
         .ap = {
-            .ssid = WIFI_SSID_AP,
-            .password = WIFI_PASS_AP,
-            .ssid_len = strlen(WIFI_SSID_AP),
-            .channel = WIFI_CHANNEL_AP,
-            .authmode = WIFI_AUTH_WPA2_PSK,
-            .max_connection = WIFI_MAX_CONN_AP,
+            .ssid           = WIFI_SSID_AP,
+            .password       = WIFI_PASS_AP,
+            .ssid_len       = strlen(WIFI_SSID_AP),
+            .channel        = WIFI_CHANNEL_AP,
+            .authmode       = WIFI_AUTH_WPA2_PSK,
+            .max_connection = WIFI_MAX_CONN_AP,  /* Nombre max de cartes relais */
         },
     };
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
     s_role = ROLE_MASTER;
-    s_connecte = true;
+    s_connecte = true;  /* Le serveur est toujours "connecté" : il EST le réseau */
     xEventGroupSetBits(s_wifi_events, WIFI_BIT_AP_DEMARRE);
 
-    ESP_LOGI(TAG, "AP démarré : SSID='%s', Canal=%d", WIFI_SSID_AP, WIFI_CHANNEL_AP);
+    ESP_LOGI(TAG, "Point d'accès actif : SSID='%s', Canal=%d, IP=192.168.4.1",
+             WIFI_SSID_AP, WIFI_CHANNEL_AP);
     return ESP_OK;
 }
 
 /* ====================================================================
- * DÉMARRAGE MODE STA (SLAVE)
+ * DÉMARRAGE EN MODE CLIENT - CARTES RELAIS
+ *
+ * Se connecte au réseau créé par la carte serveur.
+ *
+ * Si le serveur n'est pas encore démarré (démarrage simultané), on attend
+ * jusqu'à 15 secondes. Passé ce délai, la fonction retourne quand même
+ * ESP_OK : le handler d'événements continuera les tentatives en arrière-plan
+ * et la connexion s'établira dès que le serveur sera disponible.
  * ==================================================================== */
 static esp_err_t wifi_demarrer_sta(void)
 {
-    ESP_LOGI(TAG, "=== DÉMARRAGE EN MODE STA (SLAVE) ===");
+    ESP_LOGI(TAG, "=== DÉMARRAGE EN MODE CLIENT (CARTE RELAIS) ===");
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -222,80 +213,95 @@ static esp_err_t wifi_demarrer_sta(void)
 
     wifi_config_t sta_config = {
         .sta = {
-            .ssid = WIFI_SSID_AP,
-            .password = WIFI_PASS_AP,
+            .ssid      = WIFI_SSID_AP,       /* SSID créé par la carte serveur */
+            .password  = WIFI_PASS_AP,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK,
         },
     };
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
     ESP_ERROR_CHECK(esp_wifi_start());
+    /* La connexion est déclenchée par l'événement WIFI_EVENT_STA_START */
 
     s_role = ROLE_SLAVE;
 
-    /* Attendre la connexion (timeout 10s) */
-    EventBits_t bits = xEventGroupWaitBits(s_wifi_events,
-        WIFI_BIT_CONNECTE | WIFI_BIT_DECONNECTE,
-        pdFALSE, pdFALSE, pdMS_TO_TICKS(10000));
+    /*
+     * On attend la connexion 15 secondes maximum.
+     * Si le serveur n'est pas encore prêt, on continue sans bloquer :
+     * le handler d'événements relancera automatiquement esp_wifi_connect()
+     * jusqu'à ce que la connexion soit établie.
+     */
+    EventBits_t bits = xEventGroupWaitBits(
+        s_wifi_events,
+        WIFI_BIT_CONNECTE,
+        pdFALSE,             /* Ne pas effacer les bits après lecture */
+        pdFALSE,             /* Un seul bit suffit */
+        pdMS_TO_TICKS(15000) /* Attente max 15 secondes */
+    );
 
     if (bits & WIFI_BIT_CONNECTE) {
-        ESP_LOGI(TAG, "Connecté au MASTER.");
-        return ESP_OK;
+        ESP_LOGI(TAG, "Connexion au serveur établie avec succès.");
+    } else {
+        /*
+         * Pas encore connecté après 15 secondes.
+         * Ce n'est pas forcément une erreur : le serveur démarre peut-être
+         * après cette carte. Les reconnexions continuent en arrière-plan.
+         */
+        ESP_LOGW(TAG, "Serveur non joignable immédiatement. "
+                      "Les tentatives de reconnexion continuent en arrière-plan.");
     }
 
-    ESP_LOGW(TAG, "Échec connexion STA. Tentative AP...");
-    esp_wifi_stop();
-    esp_wifi_deinit();
-    return wifi_demarrer_ap();
+    return ESP_OK;  /* Toujours OK, la reconnexion est gérée par le handler */
 }
 
-/* ====================================================================
- * TIMER FAILOVER
- * ==================================================================== */
-static void timer_failover_cb(TimerHandle_t timer)
-{
-    ESP_LOGW(TAG, "Timer failover expiré ! Failover demandé.");
-    s_failover_demande = true;
-}
 /* ====================================================================
  * FONCTIONS PUBLIQUES
  * ==================================================================== */
-bool wifi_failover_est_demande(void)
-{
-    return s_failover_demande;
-}
 
-esp_err_t wifi_initialiser(role_reseau_t *role_out)
+esp_err_t wifi_initialiser(role_reseau_t *role_out, bool est_serveur)
 {
-    /* NVS déjà initialisé dans app_initialiser() */
-    esp_err_t ret;
-    /* Initialisation réseau */
+    /*
+     * Remarque : le NVS est déjà initialisé dans app_initialiser()
+     * avant l'appel à cette fonction.
+     */
+
+    /* Initialiser la pile réseau TCP/IP */
     ESP_ERROR_CHECK(esp_netif_init());
+
+    /* Créer la boucle d'événements système (WiFi, IP, etc.) */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    s_netif_ap = esp_netif_create_default_wifi_ap();
+    /*
+     * Créer les deux interfaces réseau.
+     * On les crée toujours même si on n'utilise qu'une seule.
+     * C'est la pratique recommandée par ESP-IDF pour éviter des
+     * erreurs si le mode change en cours de vie.
+     */
+    s_netif_ap  = esp_netif_create_default_wifi_ap();
     s_netif_sta = esp_netif_create_default_wifi_sta();
 
-    /* Créer le groupe d'événements */
+    /* Créer le groupe d'événements pour synchroniser l'attente de connexion */
     s_wifi_events = xEventGroupCreate();
 
-    /* Enregistrer les handlers d'événements */
+    /* Enregistrer notre handler pour les événements WiFi et IP */
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL, NULL));
+        WIFI_EVENT, ESP_EVENT_ANY_ID,    &wifi_event_handler, NULL, NULL));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL, NULL));
+        IP_EVENT,   IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL, NULL));
 
-    /* Créer le timer de failover (one-shot) */
-    s_timer_failover = xTimerCreate("failover",
-        pdMS_TO_TICKS(WIFI_FAILOVER_TIMEOUT_MS),
-        pdFALSE, NULL, timer_failover_cb);
+    esp_err_t ret;
 
-    /* Scanner pour déterminer le rôle */
-    bool reseau_existant = wifi_scanner_reseau();
-
-    if (reseau_existant) {
-        ret = wifi_demarrer_sta();
-    } else {
+    if (est_serveur) {
+        /*
+         * CARTE SERVEUR : on démarre directement en Point d'Accès.
+         * Pas de scan réseau, pas d'attente. Le rôle est connu à l'avance.
+         */
         ret = wifi_demarrer_ap();
+    } else {
+        /*
+         * CARTE RELAIS : on se connecte au réseau de la carte serveur.
+         * Le rôle est toujours SLAVE, définitivement.
+         */
+        ret = wifi_demarrer_sta();
     }
 
     if (role_out) {
@@ -312,37 +318,4 @@ role_reseau_t wifi_obtenir_role(void)
 bool wifi_est_connecte(void)
 {
     return s_connecte;
-}
-
-esp_err_t wifi_failover_vers_master(void)
-{
-    ESP_LOGW(TAG, "=== FAILOVER : SLAVE → MASTER ===");
-
-    /* Juste déconnecter et stopper, PAS deinit */
-    s_failover_demande = false;
-    esp_wifi_disconnect();
-    esp_wifi_stop();
-
-    /* Reconfigurer en AP sans détruire le driver */
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-
-    wifi_config_t ap_config = {
-        .ap = {
-            .ssid = WIFI_SSID_AP,
-            .password = WIFI_PASS_AP,
-            .ssid_len = strlen(WIFI_SSID_AP),
-            .channel = WIFI_CHANNEL_AP,
-            .authmode = WIFI_AUTH_WPA2_PSK,
-            .max_connection = WIFI_MAX_CONN_AP,
-        },
-    };
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
-
-    s_role = ROLE_MASTER;
-    s_connecte = true;
-    s_nb_tentatives_reconnexion = 0;
-
-    ESP_LOGI(TAG, "Failover terminé : AP actif.");
-    return ESP_OK;
 }

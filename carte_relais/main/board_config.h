@@ -1,12 +1,18 @@
 /**
  * @file board_config.h
- * @brief Configuration matérielle de la carte relais.
+ * @brief Configuration matérielle de la carte.
  *
  * MODIFIER CE FICHIER POUR SÉLECTIONNER LA CARTE :
- *   - Décommenter CARTE_AVANT  pour la carte cuve avant (4 relais)
- *   - Décommenter CARTE_ARRIERE pour la carte cuve arrière (8 relais)
+ *   - Décommenter CARTE_AVANT   : carte cuve avant  (4 relais : pompe, vanne, phares)
+ *   - Décommenter CARTE_ARRIERE : carte cuve arrière (8 relais : vannes motorisées)
+ *   - Décommenter CARTE_SERVEUR : carte infrastructure (WiFi AP + broker MQTT + Web UI)
  *
  * Un seul define doit être actif à la fois !
+ *
+ * Architecture du système :
+ *   CARTE_SERVEUR crée le réseau WiFi et héberge le broker MQTT.
+ *   Les cartes AVANT et ARRIERE se connectent au serveur en mode client WiFi (STA).
+ *   Les rôles sont fixes (définis ici) : plus de négociation dynamique master/slave.
  */
 #ifndef BOARD_CONFIG_H
 #define BOARD_CONFIG_H
@@ -16,13 +22,16 @@
  * ==================================================================== */
 #define CARTE_AVANT      1
 //#define CARTE_ARRIERE    1
+//#define CARTE_SERVEUR    1
 
 /* Vérification qu'une seule carte est sélectionnée */
-#if defined(CARTE_AVANT) && defined(CARTE_ARRIERE)
-    #error "Une seule carte peut être sélectionnée : CARTE_AVANT ou CARTE_ARRIERE"
+#if (defined(CARTE_AVANT)   && defined(CARTE_ARRIERE)) || \
+    (defined(CARTE_AVANT)   && defined(CARTE_SERVEUR)) || \
+    (defined(CARTE_ARRIERE) && defined(CARTE_SERVEUR))
+    #error "Une seule carte peut être sélectionnée : CARTE_AVANT, CARTE_ARRIERE ou CARTE_SERVEUR"
 #endif
-#if !defined(CARTE_AVANT) && !defined(CARTE_ARRIERE)
-    #error "Aucune carte sélectionnée : définir CARTE_AVANT ou CARTE_ARRIERE"
+#if !defined(CARTE_AVANT) && !defined(CARTE_ARRIERE) && !defined(CARTE_SERVEUR)
+    #error "Aucune carte sélectionnée : définir CARTE_AVANT, CARTE_ARRIERE ou CARTE_SERVEUR"
 #endif
 
 /* ====================================================================
@@ -43,6 +52,7 @@
 
     #include "types_pulverisateur.h"
 
+    /* Identifiant de cette carte sur le réseau MQTT */
     #define ID_CARTE                CARTE_ID_AVANT
 
     /* GPIO des relais (ADAPTER selon votre carte relais) */
@@ -51,19 +61,28 @@
     #define GPIO_RELAIS_PHARES_AV   GPIO_NUM_25
     #define GPIO_RELAIS_RESERVE_AV  GPIO_NUM_26
 
-    /* Logique relais : LOW = actif (relais actif au niveau bas) */
+    /* Logique relais : 1 = actif au niveau haut, 0 = actif au niveau bas */
     #define RELAIS_NIVEAU_ACTIF     1
 
     /* GPIO du débitmètre (entrée impulsions) */
     #define GPIO_DEBITMETRE         GPIO_NUM_13
 
-    /* Pas de vannes motorisées sur la carte avant */
-    #define A_DEBITMETRE            1
-    #define A_VANNES_MOTORISEES     0
-    #define A_SONDE_NIVEAU          0
+    /* Capacités matérielles de cette carte */
+    #define A_DEBITMETRE            1   /* Cette carte a un débitmètre */
+    #define A_VANNES_MOTORISEES     0   /* Pas de vannes motorisées */
+    #define A_SONDE_NIVEAU          0   /* Pas de sonde de niveau */
 
-    /* Web UI embarquée sur carte avant (MASTER) */
-    #define A_WEB_UI                1
+    /*
+     * A_WEB_UI = 0 : la Web UI est désormais hébergée sur la carte serveur.
+     * La carte AVANT ne fait que contrôler la pompe, la vanne et les phares.
+     */
+    #define A_WEB_UI                0
+
+    /*
+     * A_EST_SERVEUR = 0 : cette carte est une carte relais.
+     * Elle se connecte au serveur en mode client WiFi (STA).
+     */
+    #define A_EST_SERVEUR           0
 
 #endif /* CARTE_AVANT */
 
@@ -84,6 +103,7 @@
 
     #include "types_pulverisateur.h"
 
+    /* Identifiant de cette carte sur le réseau MQTT */
     #define ID_CARTE                CARTE_ID_ARRIERE
 
     /* GPIO des relais vannes 2m */
@@ -109,14 +129,59 @@
     #define GPIO_SONDE_NIVEAU       GPIO_NUM_34
     #define ADC_CANAL_SONDE         ADC_CHANNEL_6
 
-    /* Capacités */
-    #define A_DEBITMETRE            0
-    #define A_VANNES_MOTORISEES     1
-    #define A_SONDE_NIVEAU          1
+    /* Capacités matérielles de cette carte */
+    #define A_DEBITMETRE            0   /* Pas de débitmètre */
+    #define A_VANNES_MOTORISEES     1   /* Cette carte gère des vannes motorisées */
+    #define A_SONDE_NIVEAU          1   /* Cette carte a une sonde de niveau */
 
-    /* Pas de Web UI sur la carte arrière */
-    #define A_WEB_UI                1
+    /* Web UI sur le serveur uniquement */
+    #define A_WEB_UI                0
+
+    /* Carte relais, se connecte au serveur */
+    #define A_EST_SERVEUR           0
 
 #endif /* CARTE_ARRIERE */
+
+/* ====================================================================
+ * CONFIGURATION - CARTE SERVEUR
+ *
+ * Cette carte est un ESP32 identique aux cartes relais, mais dédiée
+ * uniquement à l'infrastructure réseau et à l'interface utilisateur :
+ *
+ *   - Crée le réseau WiFi (Point d'Accès / AP) → adresse IP : 192.168.4.1
+ *   - Héberge le broker MQTT sur le port 1883 (communication entre cartes)
+ *   - Héberge la Web UI (interface de contrôle accessible depuis un navigateur)
+ *   - Stocke la configuration de référence dans sa mémoire NVS
+ *   - Distribue la configuration aux cartes relais via MQTT au démarrage
+ *
+ * Elle n'a aucun relais ni capteur physique connecté.
+ * ==================================================================== */
+#ifdef CARTE_SERVEUR
+
+    #include "types_pulverisateur.h"
+
+    /* Identifiant de cette carte sur le réseau MQTT */
+    #define ID_CARTE                CARTE_ID_SERVEUR
+
+    /* Aucun relais ni capteur physique sur cette carte */
+    #define A_DEBITMETRE            0
+    #define A_VANNES_MOTORISEES     0
+    #define A_SONDE_NIVEAU          0
+
+    /* La Web UI est hébergée sur cette carte */
+    #define A_WEB_UI                1
+
+    /*
+     * A_EST_SERVEUR = 1 : cette carte est le serveur central du système.
+     *
+     * Conséquences :
+     *   - Démarre toujours en mode Point d'Accès WiFi (AP), sans chercher de réseau
+     *   - Héberge le broker MQTT auquel les cartes relais se connectent
+     *   - Est la source de vérité pour la configuration (NVS local → publication MQTT)
+     *   - N'a pas de code de failover (son rôle est permanent)
+     */
+    #define A_EST_SERVEUR           1
+
+#endif /* CARTE_SERVEUR */
 
 #endif /* BOARD_CONFIG_H */

@@ -13,18 +13,22 @@ static const char *TAG = "ACTIONNEURS";
 
 /* ====================================================================
  * HELPERS GPIO
+ *
+ * Ces fonctions utilisent RELAIS_NIVEAU_ACTIF, qui n'est défini que
+ * pour les cartes avec des relais physiques (CARTE_AVANT et CARTE_ARRIERE).
+ * La carte serveur n'a pas de relais, donc on exclut ces helpers à la
+ * compilation pour éviter une erreur de symbole non défini.
  * ==================================================================== */
+#if defined(CARTE_AVANT) || defined(CARTE_ARRIERE)
+
 static inline void gpio_relais_set(gpio_num_t pin, bool actif)
 {
-//#ifndef MODE_SIMULATION
     gpio_set_level(pin, actif ? RELAIS_NIVEAU_ACTIF : !RELAIS_NIVEAU_ACTIF);
-//#endif
     ESP_LOGD(TAG, "GPIO %d → %s", pin, actif ? "ON" : "OFF");
 }
 
 static void gpio_configurer_sortie(gpio_num_t pin)
 {
-//#ifndef MODE_SIMULATION
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << pin),
         .mode = GPIO_MODE_OUTPUT,
@@ -34,8 +38,9 @@ static void gpio_configurer_sortie(gpio_num_t pin)
     };
     gpio_config(&io_conf);
     gpio_set_level(pin, !RELAIS_NIVEAU_ACTIF); /* OFF par défaut */
-//#endif
 }
+
+#endif /* CARTE_AVANT || CARTE_ARRIERE */
 
 /* ====================================================================
  * CARTE AVANT – ÉTAT INTERNE
