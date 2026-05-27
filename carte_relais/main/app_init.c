@@ -302,7 +302,7 @@ void app_initialiser(void)
         if (err_broker != ESP_OK) {
             ESP_LOGE(TAG, "Échec démarrage broker MQTT !");
         } else {
-            ESP_LOGI(TAG, "Broker MQTT démarré sur le port %d.", MQTT_PORT);
+            ESP_LOGI(TAG, "Broker MQTT démarré sur le port %d.", MQTT_BROKER_PORT);
             /* Petit délai pour que le broker soit prêt à accepter des connexions */
             vTaskDelay(pdMS_TO_TICKS(500));
         }
