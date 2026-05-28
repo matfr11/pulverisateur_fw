@@ -572,6 +572,13 @@ static void diffuser_publish(const char *topic, const uint8_t *payload, int payl
         int cidx = s_souscriptions[i].client_idx;
         if (cidx < 0) continue;
         if (!s_clients[cidx].connecte) continue;
+        /*
+         * Ne pas renvoyer le message à son propre expéditeur.
+         * Sans ce filtre, le serveur recevrait sa propre config publiée
+         * et la republierait indéfiniment (boucle infinie).
+         * C'est l'équivalent de l'option "No Local" de MQTT 5.0.
+         */
+        if (cidx == expediteur_idx) continue;
 
         if (topic_correspond(s_souscriptions[i].filtre, topic)) {
             /* QoS effectif = min(QoS publié, QoS souscrit) */

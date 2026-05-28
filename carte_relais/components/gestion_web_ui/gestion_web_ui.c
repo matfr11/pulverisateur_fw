@@ -42,8 +42,9 @@ static httpd_handle_t s_serveur = NULL;
 static etat_carte_avant_t   s_etat_avant = {0};
 static etat_carte_arriere_t s_etat_arriere = {0};
 static configuration_t      s_config_courante = CONFIG_DEFAUT;
-static int64_t s_derniere_maj_avant = 0;
-static int64_t s_derniere_maj_arriere = 0;
+/* Initialisés très dans le passé : au démarrage, aucune carte n'est considérée présente */
+static int64_t s_derniere_maj_avant   = -10000LL;
+static int64_t s_derniere_maj_arriere = -10000LL;
 static carte_id_t s_carte_master = CARTE_ID_AVANT;  /* Mis à jour au démarrage */
 
 /* ====================================================================
@@ -59,6 +60,7 @@ static const char CSS_COMMUN[] =
 ".ver-info{font-size:.6rem;color:#444}"
 ".settings-icon{color:#666;text-decoration:none;font-size:1.1rem}"
 ".online{background:#1a592e;color:#2ecc71}"
+".partial{background:#5c3a00;color:#f39c12}"
 ".offline{background:#591a1a;color:#e74c3c}"
 ".dashboard{display:flex;flex:1;width:100%;overflow-x:auto;scroll-snap-type:x mandatory;"
 "scroll-behavior:smooth}"
@@ -216,9 +218,13 @@ static const char PAGE_PART2[] =
 "function refresh(){"
 "  fetch('/status').then(r=>r.json()).then(d=>{"
 "    var st=document.getElementById('status-tag');"
-"    var masterLbl=d.master=='AV'?'AV Master':'AR Master';"
-"    var otherLink=d.master=='AV'?(d.link_ar?'Link AR Actif':'Link AR Perdu'):(d.link_av?'Link AV Actif':'Link AV Perdu');"
-"    st.className='online';st.innerText=masterLbl+' / '+otherLink;"
+"    var avOk=d.link_av,arOk=d.link_ar;"
+"    var avTxt=avOk?'AV ✓':'AV Absente';"
+"    var arTxt=arOk?'AR ✓':'AR Absente';"
+"    if(avOk&&arOk){st.className='online';}"
+"    else if(avOk||arOk){st.className='partial';}"
+"    else{st.className='offline';}"
+"    st.innerText='Serveur OK / '+avTxt+' / '+arTxt;"
 "    var alertBox=document.getElementById('av-empty-alert');"
 "    var pBtn=document.getElementById('p_btn');"
 "    if(d.av_ok&&d.av_vide){"
@@ -560,8 +566,15 @@ static esp_err_t handler_save_config(httpd_req_t *req)
     /* Incrémenter la version */
     s_config_courante.version++;
 
-    /* Publier via MQTT (le MASTER la diffusera) */
-    mqtt_publier_mise_a_jour_config(&s_config_courante);
+    /*
+     * Publier la configuration avec retain=true sur le topic "instantane".
+     * Ceci met à jour le message retenu dans le broker : toute carte relais
+     * qui se (re)connectera ultérieurement recevra automatiquement la config
+     * à jour, sans demande explicite.
+     * Les cartes relais actuellement connectées la reçoivent aussi immédiatement
+     * car elles sont souscrites à "configuration/#".
+     */
+    mqtt_publier_configuration(&s_config_courante);
 
     /* Sauvegarder localement aussi */
     configuration_sauvegarder(&s_config_courante);

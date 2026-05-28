@@ -115,21 +115,21 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
         case WIFI_EVENT_AP_STACONNECTED: {
             /*
-             * Une carte relais vient de se connecter au point d'accès du serveur.
-             * (Événement sur la carte serveur uniquement)
+             * Un appareil vient de rejoindre le point d'accès du serveur.
+             * Peut être une carte relais, un téléphone, une tablette, etc.
+             * L'identification réelle se fait au niveau MQTT (ID_CARTE).
              */
             wifi_event_ap_staconnected_t *evt = (wifi_event_ap_staconnected_t *)event_data;
-            ESP_LOGI(TAG, "Carte relais connectée. MAC: " MACSTR, MAC2STR(evt->mac));
+            ESP_LOGI(TAG, "Appareil connecté au WiFi. MAC: " MACSTR, MAC2STR(evt->mac));
             break;
         }
 
         case WIFI_EVENT_AP_STADISCONNECTED: {
             /*
-             * Une carte relais s'est déconnectée du point d'accès du serveur.
-             * (Événement sur la carte serveur uniquement)
+             * Un appareil s'est déconnecté du point d'accès.
              */
             wifi_event_ap_stadisconnected_t *evt = (wifi_event_ap_stadisconnected_t *)event_data;
-            ESP_LOGW(TAG, "Carte relais déconnectée. MAC: " MACSTR, MAC2STR(evt->mac));
+            ESP_LOGW(TAG, "Appareil déconnecté du WiFi. MAC: " MACSTR, MAC2STR(evt->mac));
             break;
         }
 

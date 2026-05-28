@@ -146,12 +146,13 @@ static void on_commande_recue(const char *topic, const char *payload, int len)
  * Ce callback est appelé sur TOUTES les cartes (serveur et relais).
  *
  * Sur la carte serveur :
- *   → La nouvelle config vient d'une modification via la Web UI.
- *   → On la sauvegarde en NVS local (source de vérité) et on la redistribue
- *     aux cartes relais pour qu'elles mettent à jour leur cache.
+ *   → Ce callback est déclenché quand le broker envoie un message retain
+ *     au démarrage (lors de la souscription à "configuration/#").
+ *   → La config Web UI est gérée directement dans handler_save_config
+ *     (gestion_web_ui.c) qui appelle mqtt_publier_configuration() lui-même.
  *
  * Sur une carte relais :
- *   → La config vient du serveur (au démarrage ou après une modification).
+ *   → La config vient du serveur (retain au démarrage ou mise à jour en direct).
  *   → On l'applique, on la sauvegarde en NVS local (cache de secours),
  *     et si on était en attente de config, on passe en mode OPÉRATIONNEL.
  */
@@ -168,11 +169,12 @@ static void on_configuration_recue(const configuration_t *config)
 
 #if A_EST_SERVEUR
         /*
-         * Le serveur est la source de vérité : quand sa config change
-         * (via la Web UI), il la redistribue à toutes les cartes relais.
+         * Republier la config avec retain=true.
+         * Garantit que le broker a toujours la dernière version pour les
+         * cartes relais qui se (re)connectent après ce message retain.
          */
         mqtt_publier_configuration(&s_config);
-        ESP_LOGI(TAG, "Configuration mise à jour et redistribuée aux cartes relais.");
+        ESP_LOGI(TAG, "Config retain republié (version %lu).", (unsigned long)s_config.version);
 #endif
 
 #if A_DEBITMETRE
