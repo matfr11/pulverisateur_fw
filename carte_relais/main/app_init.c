@@ -29,10 +29,7 @@
 #include "gestion_web_ui.h"
 #endif
 
-#if !A_EST_SERVEUR
 #include "gestion_ota.h"
-#endif
-
 #include "mdns.h"
 
 #include "esp_log.h"

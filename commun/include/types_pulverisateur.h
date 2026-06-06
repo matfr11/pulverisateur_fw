@@ -20,7 +20,7 @@ extern "C" {
  * ==================================================================== */
 #define VERSION_PROTOCOLE       1
 #ifndef VERSION_FIRMWARE
-#define VERSION_FIRMWARE        "3.0.0"
+#define VERSION_FIRMWARE        "6.1"
 #endif
 /* ====================================================================
  * IDENTIFICATION DES CARTES
