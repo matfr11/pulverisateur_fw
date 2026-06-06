@@ -285,6 +285,10 @@ void app_initialiser(void)
     capteurs_initialiser();
 #endif
 
+    #if A_DEBITMETRE
+    capteurs_debitmetre_set_facteur_k(s_config.facteur_k_debitmetre);
+    #endif
+
     #if A_SONDE_NIVEAU
     capteurs_sonde_set_config(
         s_config.sonde_hauteur_max_mm,
