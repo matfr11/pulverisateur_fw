@@ -173,12 +173,15 @@ static void on_configuration_recue(const configuration_t *config)
 {
     ESP_LOGI(TAG, "Configuration reçue (version %lu)", (unsigned long)config->version);
 
-    /* On n'applique la config que si elle est plus récente que celle qu'on a */
     configuration_t config_locale;
     bool plus_recente;
 
     xSemaphoreTake(s_mutex_config, portMAX_DELAY);
+#if A_EST_SERVEUR
     plus_recente = (config->version >= s_config.version);
+#else
+    plus_recente = true; /* relais : le serveur est la source autoritaire */
+#endif
     if (plus_recente) {
         s_config = *config;
     }
