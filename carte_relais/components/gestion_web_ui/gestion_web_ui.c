@@ -34,6 +34,7 @@
 #include "cJSON.h"
 #include "mdns.h"
 #include "gestion_ota.h"
+#include "freertos/semphr.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@ static httpd_handle_t s_serveur = NULL;
 /* État local mis à jour via MQTT */
 static etat_carte_avant_t   s_etat_avant = {0};
 static etat_carte_arriere_t s_etat_arriere = {0};
+static SemaphoreHandle_t    s_mutex_etat = NULL;
 static configuration_t      s_config_courante = CONFIG_DEFAUT;
 /* Initialisés très dans le passé : au démarrage, aucune carte n'est considérée présente */
 static int64_t s_derniere_maj_avant   = -10000LL;
@@ -307,40 +309,47 @@ static esp_err_t handler_page_principale(httpd_req_t *req)
 /** GET /status → JSON agrégé des états AVANT + ARRIÈRE */
 static esp_err_t handler_status(httpd_req_t *req)
 {
+    etat_carte_avant_t   etat_av;
+    etat_carte_arriere_t etat_ar;
+
+    xSemaphoreTake(s_mutex_etat, portMAX_DELAY);
+    etat_av = s_etat_avant;
+    etat_ar = s_etat_arriere;
+    xSemaphoreGive(s_mutex_etat);
+
     cJSON *json = cJSON_CreateObject();
 
     /* État carte AVANT */
-    cJSON_AddBoolToObject(json, "p", s_etat_avant.pompe == POMPE_EN_MARCHE);
-    cJSON_AddBoolToObject(json, "v", s_etat_avant.vanne_3v == V3V_TRANSFERT);
-    cJSON_AddBoolToObject(json, "l", s_etat_avant.phares_avant);
-    cJSON_AddBoolToObject(json, "av_ok", s_etat_avant.debitmetre_ok);
-    cJSON_AddNumberToObject(json, "av_flow", s_etat_avant.debit_instantane);
-    cJSON_AddBoolToObject(json, "av_vide", s_etat_avant.securite_cuve == SEC_CUVE_VIDE);
-    cJSON_AddNumberToObject(json, "session_vol", s_etat_avant.volume_session);
-    cJSON_AddBoolToObject(json, "m_tr", s_etat_avant.auto_transfert == AUTO_TR_EN_COURS);
-    cJSON_AddNumberToObject(json, "tr_target", s_etat_avant.transfert_volume_cible);
-    cJSON_AddBoolToObject(json, "m_br", s_etat_avant.auto_brassage != AUTO_BR_INACTIF);
-    cJSON_AddStringToObject(json, "br_label", s_etat_avant.brassage_label);
-    cJSON_AddNumberToObject(json, "br_rem", s_etat_avant.brassage_temps_restant);
-    cJSON_AddNumberToObject(json, "br_pct", s_etat_avant.brassage_pourcentage);
+    cJSON_AddBoolToObject(json, "p", etat_av.pompe == POMPE_EN_MARCHE);
+    cJSON_AddBoolToObject(json, "v", etat_av.vanne_3v == V3V_TRANSFERT);
+    cJSON_AddBoolToObject(json, "l", etat_av.phares_avant);
+    cJSON_AddBoolToObject(json, "av_ok", etat_av.debitmetre_ok);
+    cJSON_AddNumberToObject(json, "av_flow", etat_av.debit_instantane);
+    cJSON_AddBoolToObject(json, "av_vide", etat_av.securite_cuve == SEC_CUVE_VIDE);
+    cJSON_AddNumberToObject(json, "session_vol", etat_av.volume_session);
+    cJSON_AddBoolToObject(json, "m_tr", etat_av.auto_transfert == AUTO_TR_EN_COURS);
+    cJSON_AddNumberToObject(json, "tr_target", etat_av.transfert_volume_cible);
+    cJSON_AddBoolToObject(json, "m_br", etat_av.auto_brassage != AUTO_BR_INACTIF);
+    cJSON_AddStringToObject(json, "br_label", etat_av.brassage_label);
+    cJSON_AddNumberToObject(json, "br_rem", etat_av.brassage_temps_restant);
+    cJSON_AddNumberToObject(json, "br_pct", etat_av.brassage_pourcentage);
 
     cJSON_AddNumberToObject(json, "dbg_raw", capteurs_sonde_get_debug_raw());
     cJSON_AddNumberToObject(json, "dbg_mv", capteurs_sonde_get_debug_mv());
 
     /* État carte ARRIÈRE */
     const char *map_vanne[] = {"?", "O", "F", "S", "T"};
-    int idx_v2m = (int)s_etat_arriere.vanne_2m;
-    int idx_vbt = (int)s_etat_arriere.vanne_bout_rampe;
+    int idx_v2m = (int)etat_ar.vanne_2m;
+    int idx_vbt = (int)etat_ar.vanne_bout_rampe;
     cJSON_AddStringToObject(json, "v2m",
         (idx_v2m >= 0 && idx_v2m < 5) ? map_vanne[idx_v2m] : "?");
     cJSON_AddStringToObject(json, "vbt",
         (idx_vbt >= 0 && idx_vbt < 5) ? map_vanne[idx_vbt] : "?");
-    cJSON_AddBoolToObject(json, "li", s_etat_arriere.phares_arriere);
-        /* niveau cuve arriere*/
-    float litres_ar = s_etat_arriere.niveau_cuve_arriere * s_config_courante.volume_cuve_ar / 100.0f;
+    cJSON_AddBoolToObject(json, "li", etat_ar.phares_arriere);
+    float litres_ar = etat_ar.niveau_cuve_arriere * s_config_courante.volume_cuve_ar / 100.0f;
     cJSON_AddNumberToObject(json, "niveau_ar", litres_ar);
     cJSON_AddNumberToObject(json, "niveau_ar_max", s_config_courante.volume_cuve_ar);
-    cJSON_AddBoolToObject(json, "sonde_ok", s_etat_arriere.sonde_niveau_ok);
+    cJSON_AddBoolToObject(json, "sonde_ok", etat_ar.sonde_niveau_ok);
     /* Info réseau */
     int64_t now = esp_timer_get_time() / 1000;
     cJSON_AddStringToObject(json, "master", s_carte_master == CARTE_ID_AVANT ? "AV" : "AR");
@@ -808,6 +817,10 @@ static esp_err_t handler_ota_arriere(httpd_req_t *req)
  * ==================================================================== */
 void web_ui_demarrer(const configuration_t *config)
 {
+    if (!s_mutex_etat) {
+        s_mutex_etat = xSemaphoreCreateMutex();
+    }
+
     if (config) {
         s_config_courante = *config;
     }
@@ -862,7 +875,9 @@ void web_ui_arreter(void)
 void web_ui_update_etat_avant(const etat_carte_avant_t *etat)
 {
     if (etat) {
+        xSemaphoreTake(s_mutex_etat, portMAX_DELAY);
         s_etat_avant = *etat;
+        xSemaphoreGive(s_mutex_etat);
         s_derniere_maj_avant = esp_timer_get_time() / 1000;
     }
 }
@@ -870,7 +885,9 @@ void web_ui_update_etat_avant(const etat_carte_avant_t *etat)
 void web_ui_update_etat_arriere(const etat_carte_arriere_t *etat)
 {
     if (etat) {
+        xSemaphoreTake(s_mutex_etat, portMAX_DELAY);
         s_etat_arriere = *etat;
+        xSemaphoreGive(s_mutex_etat);
         s_derniere_maj_arriere = esp_timer_get_time() / 1000;
     }
 }

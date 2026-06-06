@@ -36,6 +36,7 @@
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 #include <string.h>
 
@@ -47,6 +48,7 @@ static const char *TAG = "APP";
 static role_reseau_t        s_role = ROLE_INDEFINI;
 static etat_systeme_t       s_etat_systeme = ETAT_SYS_INITIALISATION;
 static configuration_t      s_config = CONFIG_DEFAUT;
+static SemaphoreHandle_t    s_mutex_config = NULL;
 static uint32_t             s_compteur_publication = 0;
 
 /* Intervalle de publication d'état (en ticks de la tâche à 100ms) */
@@ -106,13 +108,21 @@ static void on_commande_recue(const char *topic, const char *payload, int len)
         actionneurs_phares_avant_toggle();
     } else if (strcmp(cmd, CMD_STR_AUTO_TRANSFERT) == 0) {
         if (val && strcmp(val, CMD_VAL_ACTIVER) == 0) {
-            automatismes_transfert_activer(&s_config);
+            configuration_t cfg;
+            xSemaphoreTake(s_mutex_config, portMAX_DELAY);
+            cfg = s_config;
+            xSemaphoreGive(s_mutex_config);
+            automatismes_transfert_activer(&cfg);
         } else {
             automatismes_transfert_arreter();
         }
     } else if (strcmp(cmd, CMD_STR_AUTO_BRASSAGE) == 0) {
         if (val && strcmp(val, CMD_VAL_ACTIVER) == 0) {
-            automatismes_brassage_activer(&s_config);
+            configuration_t cfg;
+            xSemaphoreTake(s_mutex_config, portMAX_DELAY);
+            cfg = s_config;
+            xSemaphoreGive(s_mutex_config);
+            automatismes_brassage_activer(&cfg);
         } else {
             automatismes_brassage_arreter();
         }
@@ -164,41 +174,39 @@ static void on_configuration_recue(const configuration_t *config)
     ESP_LOGI(TAG, "Configuration reçue (version %lu)", (unsigned long)config->version);
 
     /* On n'applique la config que si elle est plus récente que celle qu'on a */
-    if (config->version >= s_config.version) {
+    configuration_t config_locale;
+    bool plus_recente;
+
+    xSemaphoreTake(s_mutex_config, portMAX_DELAY);
+    plus_recente = (config->version >= s_config.version);
+    if (plus_recente) {
         s_config = *config;
+    }
+    config_locale = s_config;
+    xSemaphoreGive(s_mutex_config);
+
+    if (plus_recente) {
 
         /* Sauvegarder en mémoire non-volatile */
-        configuration_sauvegarder(&s_config);
+        configuration_sauvegarder(&config_locale);
 
 #if A_EST_SERVEUR
-        /*
-         * Republier la config avec retain=true.
-         * Garantit que le broker a toujours la dernière version pour les
-         * cartes relais qui se (re)connectent après ce message retain.
-         */
-        mqtt_publier_configuration(&s_config);
-        ESP_LOGI(TAG, "Config retain republié (version %lu).", (unsigned long)s_config.version);
+        mqtt_publier_configuration(&config_locale);
+        ESP_LOGI(TAG, "Config retain republié (version %lu).", (unsigned long)config_locale.version);
 #endif
 
 #if A_DEBITMETRE
-        /* Appliquer le nouveau facteur K au débitmètre */
-        capteurs_debitmetre_set_facteur_k(s_config.facteur_k_debitmetre);
+        capteurs_debitmetre_set_facteur_k(config_locale.facteur_k_debitmetre);
 #endif
 #if A_SONDE_NIVEAU
-        /* Appliquer les nouveaux paramètres de la sonde de niveau */
         capteurs_sonde_set_config(
-            s_config.sonde_hauteur_max_mm,
-            s_config.sonde_offset_mm,
-            s_config.hauteur_cuve_mm
+            config_locale.sonde_hauteur_max_mm,
+            config_locale.sonde_offset_mm,
+            config_locale.hauteur_cuve_mm
         );
 #endif
 
 #if !A_EST_SERVEUR
-        /*
-         * Pour les cartes relais : si on était en phase de synchronisation
-         * (attente de la config initiale du serveur au démarrage),
-         * on peut maintenant passer en mode opérationnel.
-         */
         if (s_etat_systeme == ETAT_SYS_SYNCHRONISATION) {
             s_etat_systeme = ETAT_SYS_OPERATIONNEL;
             ESP_LOGI(TAG, "Config reçue du serveur → système OPÉRATIONNEL.");
@@ -245,6 +253,8 @@ void app_initialiser(void)
     ESP_LOGW(TAG, " *** MODE SIMULATION ACTIF ***");
 #endif
     ESP_LOGI(TAG, "========================================");
+
+    s_mutex_config = xSemaphoreCreateMutex();
 
     /* 0. Initialiser NVS (nécessaire pour config ET WiFi) */
     esp_err_t ret = nvs_flash_init();
@@ -438,6 +448,11 @@ void app_tache_principale(void *pvParameters)
     TickType_t dernier_reveil = xTaskGetTickCount();
 
     while (1) {
+        configuration_t config;
+        xSemaphoreTake(s_mutex_config, portMAX_DELAY);
+        config = s_config;
+        xSemaphoreGive(s_mutex_config);
+
         /* --- Lecture des capteurs --- */
 #if A_DEBITMETRE
         capteurs_debitmetre_update();
@@ -450,7 +465,7 @@ void app_tache_principale(void *pvParameters)
         /* --- Sécurités (cuve vide) --- */
         bool pompe_active = actionneurs_pompe_est_active();
         float debit = capteurs_debitmetre_get_debit();
-        securites_update(pompe_active, debit, &s_config);
+        securites_update(pompe_active, debit, &config);
 
         /* Si cuve vide → arrêter automatismes */
         if (securites_cuve_est_vide()) {
@@ -463,7 +478,7 @@ void app_tache_principale(void *pvParameters)
 
 #ifdef CARTE_ARRIERE
         /* --- Timeout vannes motorisées --- */
-        actionneurs_vannes_update_timeout(s_config.timeout_vanne_ms);
+        actionneurs_vannes_update_timeout(config.timeout_vanne_ms);
 #endif
 
         /* --- Publication MQTT périodique (toutes les INTERVALLE_PUBLICATION × 100ms) --- */
@@ -482,7 +497,7 @@ void app_tache_principale(void *pvParameters)
                     .debitmetre_ok = capteurs_debitmetre_est_ok(),
                     .auto_transfert = automatismes_get_etat_transfert(),
                     .auto_brassage = automatismes_get_etat_brassage(),
-                    .transfert_volume_cible = s_config.volume_transfert,
+                    .transfert_volume_cible = config.volume_transfert,
                     .securite_cuve = securites_get_etat_cuve(),
                     .etat_systeme = s_etat_systeme,
                 };

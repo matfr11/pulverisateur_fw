@@ -214,6 +214,12 @@ void automatismes_update(float debit_lpm, float volume_session)
 {
     int64_t maintenant = esp_timer_get_time() / 1000;
 
+    /* L'état TERMINE a été publié par app_tache_principale lors de l'itération
+     * précédente. On peut maintenant finaliser l'arrêt. */
+    if (s_transfert.etat == AUTO_TR_TERMINE) {
+        automatismes_transfert_arreter();
+    }
+
 /* --- TRANSFERT (auto + manuel) --- */
     bool pompe_active = actionneurs_pompe_est_active();
     bool vanne_transfert = actionneurs_v3v_est_transfert();
@@ -240,8 +246,11 @@ void automatismes_update(float debit_lpm, float volume_session)
     if (s_transfert.etat == AUTO_TR_EN_COURS) {
         if (s_transfert.volume_transfere >= (float)s_transfert.volume_cible) {
             ESP_LOGI(TAG, "Transfert terminé : %.1f L transférés.", s_transfert.volume_transfere);
+            actionneurs_pompe_set(false);
+            actionneurs_v3v_set(V3V_BRASSAGE);
             s_transfert.etat = AUTO_TR_TERMINE;
-            automatismes_transfert_arreter();
+            /* arreter() sera appelé à l'itération suivante (voir début de fonction),
+             * après que app_tache_principale a publié l'état TERMINE via MQTT. */
         }
     }
 

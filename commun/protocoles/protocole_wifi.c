@@ -19,6 +19,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "esp_mac.h"
@@ -52,12 +53,18 @@ static esp_netif_t         *s_netif_sta = NULL;
 #define MAX_TENTATIVES_RAPIDES  5
 
 static int s_nb_tentatives_reconnexion = 0;
+static esp_timer_handle_t s_timer_reconnexion = NULL;
 
 /* ====================================================================
  * PROTOTYPES INTERNES
  * ==================================================================== */
 static esp_err_t wifi_demarrer_ap(void);
 static esp_err_t wifi_demarrer_sta(void);
+
+static void timer_reconnexion_cb(void *arg)
+{
+    esp_wifi_connect();
+}
 
 /* ====================================================================
  * HANDLER D'ÉVÉNEMENTS
@@ -93,23 +100,19 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
             s_nb_tentatives_reconnexion++;
 
+            if (esp_timer_is_active(s_timer_reconnexion)) {
+                esp_timer_stop(s_timer_reconnexion);
+            }
+
             if (s_nb_tentatives_reconnexion <= MAX_TENTATIVES_RAPIDES) {
-                /* Tentatives rapides : le serveur vient peut-être de redémarrer */
                 ESP_LOGW(TAG, "Connexion perdue. Tentative %d/%d dans 2s...",
                          s_nb_tentatives_reconnexion, MAX_TENTATIVES_RAPIDES);
-                vTaskDelay(pdMS_TO_TICKS(2000));
-                esp_wifi_connect();
+                esp_timer_start_once(s_timer_reconnexion, 2000 * 1000);
             } else {
-                /*
-                 * Le serveur est probablement hors ligne.
-                 * On continue à chercher mais avec un délai plus long
-                 * pour ne pas surcharger inutilement le réseau.
-                 */
+                /* Serveur probablement hors ligne — espacer les tentatives */
                 ESP_LOGW(TAG, "Serveur non joignable. Nouvelle tentative dans 15s...");
-                vTaskDelay(pdMS_TO_TICKS(15000));
-                /* On garde le compteur à MAX pour rester en phase 2 */
                 s_nb_tentatives_reconnexion = MAX_TENTATIVES_RAPIDES;
-                esp_wifi_connect();
+                esp_timer_start_once(s_timer_reconnexion, 15000 * 1000);
             }
             break;
 
@@ -221,6 +224,12 @@ static esp_err_t wifi_demarrer_sta(void)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
     ESP_ERROR_CHECK(esp_wifi_start());
     /* La connexion est déclenchée par l'événement WIFI_EVENT_STA_START */
+
+    const esp_timer_create_args_t timer_args = {
+        .callback = timer_reconnexion_cb,
+        .name = "wifi_reconnexion"
+    };
+    ESP_ERROR_CHECK(esp_timer_create(&timer_args, &s_timer_reconnexion));
 
     s_role = ROLE_SLAVE;
 

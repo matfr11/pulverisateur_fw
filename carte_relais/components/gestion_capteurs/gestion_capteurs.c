@@ -107,9 +107,7 @@ void capteurs_debitmetre_update(void)
     if (delta_impulsions == 0) {
         s_compteur_absence++;
         if (s_compteur_absence > ABSENCE_TIMEOUT_CYCLES) {
-            /* Pas d'impulsions depuis longtemps, mais on garde le capteur OK
-             * tant que la pompe pourrait être arrêtée. La sécurité cuve vide
-             * gère le cas pompe active + pas de débit. */
+            s_debitmetre_ok = false;
         }
     } else {
         s_compteur_absence = 0;

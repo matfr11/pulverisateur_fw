@@ -89,9 +89,12 @@ static void test_tr_auto_stop_quand_cible_atteinte(void) {
     automatismes_transfert_activer(&cfg_test);   /* cible = 100 L */
     mock_volume_session = 100.0f;
     automatismes_update(mock_debit_lpm, mock_volume_session);
-    /* Auto-stop : pompe OFF, vanne brassage */
+    /* Auto-stop : pompe OFF, vanne brassage, état TERMINE visible 1 itération */
     TEST_ASSERT(!mock_pompe_active);
     TEST_ASSERT(mock_v3v == V3V_BRASSAGE);
+    TEST_ASSERT_EQ(automatismes_get_etat_transfert(), AUTO_TR_TERMINE);
+    /* Itération suivante : TERMINE nettoyé → INACTIF */
+    automatismes_update(mock_debit_lpm, mock_volume_session);
     TEST_ASSERT_EQ(automatismes_get_etat_transfert(), AUTO_TR_INACTIF);
 }
 
@@ -190,9 +193,7 @@ static void test_arret_tout(void) {
 }
 
 /* ================================================================
- * RÉGRESSION : AUTO_TR_TERMINE jamais visible (bug connu)
- * Ce test documente le comportement actuel — il PASSE car le bug existe.
- * Quand le bug sera corrigé, ce test devra être mis à jour.
+ * AUTO_TR_TERMINE observable pendant exactement une itération
  * ================================================================ */
 static void test_regression_tr_termine_jamais_observable(void) {
     reset();
@@ -200,10 +201,14 @@ static void test_regression_tr_termine_jamais_observable(void) {
     mock_volume_session = 100.0f;
     automatismes_update(mock_debit_lpm, mock_volume_session);
 
-    /* BUG CONNU : AUTO_TR_TERMINE est écrasé par AUTO_TR_INACTIF dans le même appel.
-     * L'état résultant est donc INACTIF, pas TERMINE. Ce test documente ce comportement. */
+    /* Après la première update : TERMINE est visible (app_tache_principale peut le publier) */
     etat_auto_transfert_t etat = automatismes_get_etat_transfert();
-    TEST_ASSERT_EQ(etat, AUTO_TR_INACTIF);  /* INACTIF, pas TERMINE */
+    TEST_ASSERT_EQ(etat, AUTO_TR_TERMINE);
+
+    /* Après la deuxième update : TERMINE est nettoyé → INACTIF */
+    automatismes_update(mock_debit_lpm, mock_volume_session);
+    etat = automatismes_get_etat_transfert();
+    TEST_ASSERT_EQ(etat, AUTO_TR_INACTIF);
 }
 
 /* ================================================================

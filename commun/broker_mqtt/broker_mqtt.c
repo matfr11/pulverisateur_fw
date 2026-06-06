@@ -44,12 +44,13 @@ static const char *TAG = "BROKER";
 
 /** Client connecté */
 typedef struct {
-    int     sock;                                       /**< Socket (-1 = libre) */
-    bool    connecte;                                   /**< CONNECT reçu et accepté */
-    char    client_id[64];                              /**< Client ID */
-    uint8_t buffer[BROKER_TAILLE_BUFFER];               /**< Buffer de réception */
-    int     buf_len;                                    /**< Données dans le buffer */
-    int64_t dernier_paquet_ms;                          /**< Timestamp du dernier paquet */
+    int      sock;                                      /**< Socket (-1 = libre) */
+    bool     connecte;                                  /**< CONNECT reçu et accepté */
+    char     client_id[64];                             /**< Client ID */
+    uint8_t  buffer[BROKER_TAILLE_BUFFER];              /**< Buffer de réception */
+    int      buf_len;                                   /**< Données dans le buffer */
+    int64_t  dernier_paquet_ms;                         /**< Timestamp du dernier paquet */
+    uint16_t keepalive_s;                               /**< Keepalive annoncé (0 = désactivé) */
 } broker_client_t;
 
 /** Souscription */
@@ -191,25 +192,30 @@ static int client_trouver_libre(void)
 static void client_deconnecter(int idx)
 {
     if (idx < 0 || idx >= BROKER_MAX_CLIENTS) return;
+
+    int sock_a_fermer = -1;
+
+    xSemaphoreTake(s_mutex, portMAX_DELAY);
     broker_client_t *c = &s_clients[idx];
-
     if (c->sock >= 0) {
+        sock_a_fermer = c->sock;
         ESP_LOGI(TAG, "Client [%d] '%s' déconnecté.", idx, c->client_id);
-        close(c->sock);
     }
-
-    /* Supprimer toutes les souscriptions de ce client */
     for (int i = 0; i < BROKER_MAX_SOUSCRIPTIONS; i++) {
         if (s_souscriptions[i].client_idx == idx) {
             s_souscriptions[i].client_idx = -1;
             s_souscriptions[i].filtre[0] = '\0';
         }
     }
-
     c->sock = -1;
     c->connecte = false;
     c->client_id[0] = '\0';
     c->buf_len = 0;
+    xSemaphoreGive(s_mutex);
+
+    if (sock_a_fermer >= 0) {
+        close(sock_a_fermer);
+    }
 }
 
 /* ====================================================================
@@ -293,8 +299,9 @@ static void traiter_connect(int idx, uint8_t *payload, int len)
     /* Connect Flags */
     /* uint8_t flags = payload[7]; */
 
-    /* Keep Alive (on ignore pour simplifier) */
-    /* uint16_t keepalive = (payload[8] << 8) | payload[9]; */
+    /* Keep Alive */
+    uint16_t keepalive = (uint16_t)((payload[8] << 8) | payload[9]);
+    s_clients[idx].keepalive_s = keepalive;
 
     /* Client ID */
     int pos = 10;
@@ -503,13 +510,18 @@ static void envoyer_puback(int idx, uint16_t packet_id)
 
 static void envoyer_suback(int idx, uint16_t packet_id, uint8_t *codes, int nb_codes)
 {
-    uint8_t pkt[4 + BROKER_MAX_SOUSCRIPTIONS];
-    pkt[0] = (MQTT_SUBACK << 4);
-    pkt[1] = (uint8_t)(2 + nb_codes);  /* Remaining length */
-    pkt[2] = (uint8_t)(packet_id >> 8);
-    pkt[3] = (uint8_t)(packet_id & 0xFF);
-    memcpy(pkt + 4, codes, nb_codes);
-    envoyer_raw(s_clients[idx].sock, pkt, 4 + nb_codes);
+    /* remaining = 2 (packet_id) + nb_codes (codes retour), peut dépasser 127 octets */
+    uint8_t rl_buf[4];
+    int rl_len = encoder_longueur_restante(rl_buf, 2 + nb_codes);
+
+    uint8_t header[1 + 4 + 2];  /* type + rl (max 4 octets) + packet_id */
+    header[0] = (MQTT_SUBACK << 4);
+    memcpy(header + 1, rl_buf, rl_len);
+    header[1 + rl_len]     = (uint8_t)(packet_id >> 8);
+    header[1 + rl_len + 1] = (uint8_t)(packet_id & 0xFF);
+
+    envoyer_raw(s_clients[idx].sock, header, 1 + rl_len + 2);
+    envoyer_raw(s_clients[idx].sock, codes, nb_codes);
 }
 
 static void envoyer_unsuback(int idx, uint16_t packet_id)
@@ -692,22 +704,40 @@ static void broker_tache(void *param)
             int new_sock = accept(s_socket_ecoute, (struct sockaddr *)&addr_client, &addr_len);
 
             if (new_sock >= 0) {
+                xSemaphoreTake(s_mutex, portMAX_DELAY);
                 int idx = client_trouver_libre();
                 if (idx >= 0) {
                     s_clients[idx].sock = new_sock;
                     s_clients[idx].connecte = false;
                     s_clients[idx].buf_len = 0;
                     s_clients[idx].dernier_paquet_ms = esp_timer_get_time() / 1000;
+                    s_clients[idx].keepalive_s = 0;
+                }
+                xSemaphoreGive(s_mutex);
 
-                    /* Non-bloquant */
+                if (idx >= 0) {
                     int flag = 1;
                     lwip_setsockopt(new_sock, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
-
                     ESP_LOGI(TAG, "Nouveau client [%d] depuis %s:%d",
                              idx, inet_ntoa(addr_client.sin_addr), ntohs(addr_client.sin_port));
                 } else {
                     ESP_LOGW(TAG, "Max clients atteint, connexion refusée.");
                     close(new_sock);
+                }
+            }
+        }
+
+        /* Vérification keepalive : déconnecter les clients silencieux */
+        {
+            int64_t now_ms = esp_timer_get_time() / 1000;
+            for (int i = 0; i < BROKER_MAX_CLIENTS; i++) {
+                if (s_clients[i].sock < 0 || !s_clients[i].connecte) continue;
+                if (s_clients[i].keepalive_s == 0) continue;
+                int64_t timeout_ms = (int64_t)s_clients[i].keepalive_s * 1500;
+                if (now_ms - s_clients[i].dernier_paquet_ms > timeout_ms) {
+                    ESP_LOGW(TAG, "Client [%d] '%s' keepalive expiré, déconnexion.",
+                             i, s_clients[i].client_id);
+                    client_deconnecter(i);
                 }
             }
         }
@@ -880,9 +910,11 @@ bool broker_mqtt_est_actif(void)
 
 int broker_mqtt_nb_clients(void)
 {
+    xSemaphoreTake(s_mutex, portMAX_DELAY);
     int nb = 0;
     for (int i = 0; i < BROKER_MAX_CLIENTS; i++) {
         if (s_clients[i].sock >= 0 && s_clients[i].connecte) nb++;
     }
+    xSemaphoreGive(s_mutex);
     return nb;
 }

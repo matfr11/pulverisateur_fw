@@ -21,12 +21,19 @@ DEFS = -DCARTE_AVANT \
        -DA_VANNES_MOTORISEES=0 \
        -DMODE_SIMULATION
 
+DEFS_CAPTEURS = -DCARTE_AVANT \
+       -DA_DEBITMETRE=1 \
+       -DA_SONDE_NIVEAU=0 \
+       -DA_WEB_UI=0 \
+       -DA_EST_SERVEUR=0 \
+       -DA_VANNES_MOTORISEES=0
+
 CFLAGS = -Wall -Wextra -Wno-unused-function -Wno-unused-parameter \
          -g -O0 $(INC) $(DEFS)
 
 .PHONY: all run clean
 
-all: test_broker test_json test_securites test_automatismes test_ota_proxy
+all: test_broker test_json test_securites test_automatismes test_ota_proxy test_capteurs
 
 run: all
 	@echo ""
@@ -37,7 +44,8 @@ run: all
 	@./test_json      ; echo ""
 	@./test_securites ; echo ""
 	@./test_automatismes ; echo ""
-	@./test_ota_proxy
+	@./test_ota_proxy ; echo ""
+	@./test_capteurs
 
 test_broker: test_broker_logic.c stubs/broker_stubs.c
 	@echo "[CC] test_broker"
@@ -59,5 +67,10 @@ test_ota_proxy: test_ota_proxy.c
 	@echo "[CC] test_ota_proxy"
 	@gcc $(CFLAGS) -I../carte_relais/components/gestion_ota/include -o $@ $^
 
+test_capteurs: test_capteurs.c
+	@echo "[CC] test_capteurs"
+	@gcc -Wall -Wextra -Wno-unused-function -Wno-unused-parameter \
+	     -g -O0 $(INC) $(DEFS_CAPTEURS) -o $@ $^
+
 clean:
-	rm -f test_broker test_json test_securites test_automatismes test_ota_proxy
+	rm -f test_broker test_json test_securites test_automatismes test_ota_proxy test_capteurs

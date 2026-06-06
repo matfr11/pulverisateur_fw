@@ -27,7 +27,6 @@ static mqtt_callback_etat_t     s_cb_etat = NULL;
 
 /* Buffer pour la sérialisation JSON */
 #define JSON_BUFFER_SIZE    1024
-static char s_json_buffer[JSON_BUFFER_SIZE];
 
 /* ====================================================================
  * HANDLER ÉVÉNEMENTS MQTT
@@ -166,21 +165,23 @@ bool mqtt_est_connecte(void)
  * ==================================================================== */
 esp_err_t mqtt_publier_etat_avant(const etat_carte_avant_t *etat)
 {
-    int len = json_serialiser_etat_avant(etat, s_json_buffer, JSON_BUFFER_SIZE);
+    char buf[JSON_BUFFER_SIZE];
+    int len = json_serialiser_etat_avant(etat, buf, JSON_BUFFER_SIZE);
     if (len < 0) return ESP_FAIL;
 
     int msg_id = esp_mqtt_client_publish(s_client, TOPIC_ETAT_AVANT,
-                                          s_json_buffer, len, 0, 1 /* retain */);
+                                          buf, len, 0, 1 /* retain */);
     return (msg_id >= 0) ? ESP_OK : ESP_FAIL;
 }
 
 esp_err_t mqtt_publier_etat_arriere(const etat_carte_arriere_t *etat)
 {
-    int len = json_serialiser_etat_arriere(etat, s_json_buffer, JSON_BUFFER_SIZE);
+    char buf[JSON_BUFFER_SIZE];
+    int len = json_serialiser_etat_arriere(etat, buf, JSON_BUFFER_SIZE);
     if (len < 0) return ESP_FAIL;
 
     int msg_id = esp_mqtt_client_publish(s_client, TOPIC_ETAT_ARRIERE,
-                                          s_json_buffer, len, 0, 1 /* retain */);
+                                          buf, len, 0, 1 /* retain */);
     return (msg_id >= 0) ? ESP_OK : ESP_FAIL;
 }
 
@@ -224,11 +225,12 @@ esp_err_t mqtt_publier_arret_urgence(void)
  * ==================================================================== */
 esp_err_t mqtt_publier_configuration(const configuration_t *config)
 {
-    int len = json_serialiser_configuration(config, s_json_buffer, JSON_BUFFER_SIZE);
+    char buf[JSON_BUFFER_SIZE];
+    int len = json_serialiser_configuration(config, buf, JSON_BUFFER_SIZE);
     if (len < 0) return ESP_FAIL;
 
     int msg_id = esp_mqtt_client_publish(s_client, TOPIC_CONFIG_INSTANTANE,
-                                          s_json_buffer, len, 1, 1 /* retain */);
+                                          buf, len, 1, 1 /* retain */);
     return (msg_id >= 0) ? ESP_OK : ESP_FAIL;
 }
 
@@ -242,11 +244,12 @@ esp_err_t mqtt_demander_configuration(void)
 
 esp_err_t mqtt_publier_mise_a_jour_config(const configuration_t *config)
 {
-    int len = json_serialiser_configuration(config, s_json_buffer, JSON_BUFFER_SIZE);
+    char buf[JSON_BUFFER_SIZE];
+    int len = json_serialiser_configuration(config, buf, JSON_BUFFER_SIZE);
     if (len < 0) return ESP_FAIL;
 
     int msg_id = esp_mqtt_client_publish(s_client, TOPIC_CONFIG_MISE_A_JOUR,
-                                          s_json_buffer, len, 1, 0);
+                                          buf, len, 1, 0);
     return (msg_id >= 0) ? ESP_OK : ESP_FAIL;
 }
 

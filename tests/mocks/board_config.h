@@ -17,4 +17,5 @@
 #define A_WEB_UI            0
 #define A_EST_SERVEUR       0
 
+#undef  VERSION_FIRMWARE
 #define VERSION_FIRMWARE    "3.0.0-test"
