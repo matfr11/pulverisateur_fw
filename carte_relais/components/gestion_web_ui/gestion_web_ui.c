@@ -419,10 +419,10 @@ static esp_err_t handler_api_cmd(httpd_req_t *req)
 static esp_err_t handler_page_settings(httpd_req_t *req)
 {
     /* Page settings simplifiée – même structure que ui_settings.h */
-    char *page = malloc(10240);
+    char *page = malloc(14336);
     if (!page) return ESP_ERR_NO_MEM;
 
-    int len = snprintf(page, 10240,
+    int len = snprintf(page, 14336,
         "<!DOCTYPE html><html><head><meta charset='UTF-8'>"
         "<meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>"
         "<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>"
