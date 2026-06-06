@@ -3,6 +3,19 @@
 **/managed_components/
 **/dependencies.lock
 
+# Fichiers générés par ESP-IDF
+carte_relais/sdkconfig
+carte_relais/sdkconfig.old
+
+# Binaires de tests compilés
+tests/test_broker
+tests/test_json
+tests/test_securites
+tests/test_automatismes
+tests/test_ota_proxy
+tests/test_mdns_hostname
+tests/test_capteurs
+
 # On ignore les archives
 *.zip
 *.rar
