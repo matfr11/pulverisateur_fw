@@ -29,8 +29,11 @@
 #include "esp_partition.h"
 
 #include "esp_http_server.h"
+#include "esp_http_client.h"
 #include "esp_log.h"
 #include "cJSON.h"
+#include "mdns.h"
+#include "gestion_ota.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -450,19 +453,32 @@ static esp_err_t handler_page_settings(httpd_req_t *req)
         "<div id='jFillOta' class='h-gauge-fill' style='background:#f39c12'></div>"
         "<div id='jTextOta' class='h-gauge-text'>0%%</div>"
         "</div></div>"
-        "<button class='btn-full' style='background:#663300;color:#ffaa00;border:1px solid #885500'"
-        " onclick='doOta()'>FLASHER LE FIRMWARE</button>"
+        "<div style='display:flex;gap:6px;margin-top:8px'>"
+        "<button onclick=\"doOta('/api/ota')\""
+        " style='flex:1;padding:8px;background:#1a3a1a;color:#2ecc71;border:1px solid #2ecc71;border-radius:4px;cursor:pointer'>"
+        "SERVEUR</button>"
+        "<button onclick=\"doOta('/api/ota/avant')\""
+        " style='flex:1;padding:8px;background:#1a2a3a;color:#39f;border:1px solid #39f;border-radius:4px;cursor:pointer'>"
+        "CARTE AVANT</button>"
+        "<button onclick=\"doOta('/api/ota/arriere')\""
+        " style='flex:1;padding:8px;background:#2a1a3a;color:#a060ff;border:1px solid #a060ff;border-radius:4px;cursor:pointer'>"
+        "CARTE ARRI&Egrave;RE</button>"
+        "</div>"
         "</div>"
         "<br><button class='btn-full active-green' onclick='saveSettings()'>"
         "ENREGISTRER</button></div>"
         "<script>"
-        "function doOta(){"
+        "function doOta(url){"
         "  var f=document.getElementById('ota_file').files[0];"
         "  if(!f){alert('Choisir un fichier .bin');return;}"
-        "  if(!confirm('Flasher '+f.name+' ('+Math.round(f.size/1024)+' KB) ?\\nLa carte va redémarrer.')){return;}"
+        "  var cible=url=='/api/ota'?'SERVEUR':url=='/api/ota/avant'?'CARTE AVANT':'CARTE ARRIERE';"
+        "  if(!confirm('Flasher '+f.name+' ('+Math.round(f.size/1024)+' KB) sur '+cible+' ?\\nLa carte va redémarrer.')){return;}"
         "  var pg=document.getElementById('ota_progress');pg.style.display='block';"
+        "  document.getElementById('jFillOta').style.width='0%%';"
+        "  document.getElementById('jTextOta').innerText='0%%';"
+        "  document.getElementById('jFillOta').style.background='#f39c12';"
         "  var xhr=new XMLHttpRequest();"
-        "  xhr.open('POST','/api/ota');"
+        "  xhr.open('POST',url);"
         "  xhr.upload.onprogress=function(e){"
         "    if(e.lengthComputable){"
         "      var p=Math.round(e.loaded/e.total*100);"
@@ -670,6 +686,124 @@ static esp_err_t handler_ota(httpd_req_t *req)
 }
 
 /* ====================================================================
+ * PROXY OTA VERS LES CARTES RELAIS
+ * ==================================================================== */
+
+/**
+ * Reçoit un firmware du navigateur par chunks et le retransmet en streaming
+ * vers la carte relais (hostname mDNS). Jamais plus de 4 KB en RAM.
+ */
+static esp_err_t proxy_ota_vers_relais(httpd_req_t *req, const char *hostname)
+{
+    if (req->content_len == 0) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Content-Length manquant");
+        return ESP_FAIL;
+    }
+
+    /* Résolution mDNS → adresse IP */
+    esp_ip4_addr_t addr = {0};
+    esp_err_t err = mdns_query_a(hostname, 2000, &addr);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "mDNS : '%s' introuvable (%s)", hostname, esp_err_to_name(err));
+        httpd_resp_set_status(req, "502 Bad Gateway");
+        httpd_resp_send(req, "Carte non joignable", HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+
+    char url[48];
+    snprintf(url, sizeof(url), "http://" IPSTR "/ota", IP2STR(&addr));
+    ESP_LOGI(TAG, "OTA proxy → %s (%d octets)", url, req->content_len);
+
+    esp_http_client_config_t client_cfg = {
+        .url            = url,
+        .method         = HTTP_METHOD_POST,
+        .timeout_ms     = 120000,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&client_cfg);
+    if (!client) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Client HTTP init failed");
+        return ESP_FAIL;
+    }
+
+    char content_len_str[16];
+    snprintf(content_len_str, sizeof(content_len_str), "%d", req->content_len);
+    esp_http_client_set_header(client, "Content-Length", content_len_str);
+    esp_http_client_set_header(client, "Content-Type", "application/octet-stream");
+
+    err = esp_http_client_open(client, req->content_len);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Connexion HTTP vers relais impossible: %s", esp_err_to_name(err));
+        esp_http_client_cleanup(client);
+        httpd_resp_set_status(req, "502 Bad Gateway");
+        httpd_resp_send(req, "Carte non joignable", HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+
+    char *buf = malloc(4096);
+    if (!buf) {
+        esp_http_client_close(client);
+        esp_http_client_cleanup(client);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Malloc failed");
+        return ESP_FAIL;
+    }
+
+    int remaining = req->content_len;
+    while (remaining > 0) {
+        int chunk = (remaining < 4096) ? remaining : 4096;
+        int received = httpd_req_recv(req, buf, chunk);
+        if (received <= 0) {
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) continue;
+            ESP_LOGE(TAG, "OTA proxy : erreur réception navigateur");
+            free(buf);
+            esp_http_client_close(client);
+            esp_http_client_cleanup(client);
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Recv error");
+            return ESP_FAIL;
+        }
+        int written = esp_http_client_write(client, buf, received);
+        if (written < 0) {
+            ESP_LOGE(TAG, "OTA proxy : erreur envoi vers relais");
+            free(buf);
+            esp_http_client_close(client);
+            esp_http_client_cleanup(client);
+            httpd_resp_set_status(req, "502 Bad Gateway");
+            httpd_resp_send(req, "Erreur transfert", HTTPD_RESP_USE_STRLEN);
+            return ESP_FAIL;
+        }
+        remaining -= received;
+    }
+    free(buf);
+
+    int status = esp_http_client_fetch_headers(client);
+    int http_status = esp_http_client_get_status_code(client);
+    (void)status;
+
+    esp_http_client_close(client);
+    esp_http_client_cleanup(client);
+
+    if (http_status == 200) {
+        ESP_LOGI(TAG, "OTA proxy : succès vers %s", hostname);
+        httpd_resp_send(req, "OK", 2);
+        return ESP_OK;
+    } else {
+        ESP_LOGE(TAG, "OTA proxy : la carte a répondu %d", http_status);
+        httpd_resp_set_status(req, "502 Bad Gateway");
+        httpd_resp_send(req, "OTA échouée sur la carte", HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+}
+
+static esp_err_t handler_ota_avant(httpd_req_t *req)
+{
+    return proxy_ota_vers_relais(req, OTA_HOSTNAME_AVANT);
+}
+
+static esp_err_t handler_ota_arriere(httpd_req_t *req)
+{
+    return proxy_ota_vers_relais(req, OTA_HOSTNAME_ARRIERE);
+}
+
+/* ====================================================================
  * DÉMARRAGE / ARRÊT DU SERVEUR
  * ==================================================================== */
 void web_ui_demarrer(const configuration_t *config)
@@ -679,7 +813,7 @@ void web_ui_demarrer(const configuration_t *config)
     }
 
     httpd_config_t http_config = HTTPD_DEFAULT_CONFIG();
-    http_config.max_uri_handlers = 12;
+    http_config.max_uri_handlers = 14;
     http_config.stack_size = 8192;
 
     if (httpd_start(&s_serveur, &http_config) != ESP_OK) {
@@ -698,14 +832,20 @@ void web_ui_demarrer(const configuration_t *config)
                                   .handler = handler_page_settings };
     httpd_uri_t uri_save = { .uri = "/api/save_config", .method = HTTP_POST,
                               .handler = handler_save_config };
-    httpd_uri_t uri_ota = { .uri = "/api/ota", .method = HTTP_POST,
-                            .handler = handler_ota };
+    httpd_uri_t uri_ota    = { .uri = "/api/ota",         .method = HTTP_POST,
+                               .handler = handler_ota };
+    httpd_uri_t uri_ota_av = { .uri = "/api/ota/avant",   .method = HTTP_POST,
+                               .handler = handler_ota_avant };
+    httpd_uri_t uri_ota_ar = { .uri = "/api/ota/arriere", .method = HTTP_POST,
+                               .handler = handler_ota_arriere };
     httpd_register_uri_handler(s_serveur, &uri_main);
     httpd_register_uri_handler(s_serveur, &uri_status);
     httpd_register_uri_handler(s_serveur, &uri_cmd);
     httpd_register_uri_handler(s_serveur, &uri_settings);
     httpd_register_uri_handler(s_serveur, &uri_save);
     httpd_register_uri_handler(s_serveur, &uri_ota);
+    httpd_register_uri_handler(s_serveur, &uri_ota_av);
+    httpd_register_uri_handler(s_serveur, &uri_ota_ar);
 
     ESP_LOGI(TAG, "Serveur HTTP démarré sur le port %d.", http_config.server_port);
 }

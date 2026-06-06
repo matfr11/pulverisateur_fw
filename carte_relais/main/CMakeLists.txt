@@ -4,7 +4,7 @@ idf_component_register(
         "app_init.c"
     INCLUDE_DIRS 
         "."
-    REQUIRES 
+    REQUIRES
         commun
         gestion_actionneurs
         gestion_capteurs
@@ -12,4 +12,6 @@ idf_component_register(
         gestion_securites
         gestion_configuration
         gestion_web_ui
+        gestion_ota
+        mdns
 )

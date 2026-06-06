@@ -29,6 +29,12 @@
 #include "gestion_web_ui.h"
 #endif
 
+#if !A_EST_SERVEUR
+#include "gestion_ota.h"
+#endif
+
+#include "mdns.h"
+
 #include "esp_log.h"
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
@@ -290,6 +296,19 @@ void app_initialiser(void)
     wifi_initialiser(&s_role, A_EST_SERVEUR);
     ESP_LOGI(TAG, "Rôle réseau : %s", s_role == ROLE_MASTER ? "SERVEUR (MASTER)" : "RELAIS (SLAVE)");
 
+    /* 4b. mDNS : chaque carte annonce son hostname sur le réseau local */
+    mdns_init();
+    mdns_hostname_set(
+#ifdef CARTE_AVANT
+        OTA_HOSTNAME_AVANT
+#elif defined(CARTE_ARRIERE)
+        OTA_HOSTNAME_ARRIERE
+#else
+        OTA_HOSTNAME_SERVEUR
+#endif
+    );
+    mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0);
+
     /*
      * 4b. Démarrer le broker MQTT embarqué (carte serveur uniquement).
      *
@@ -402,7 +421,12 @@ void app_initialiser(void)
     securites_initialiser();
 #endif
 
-    /* 9. Lancer la tâche principale */
+    /* 9. Démarrer le serveur OTA (cartes relais uniquement) */
+#if !A_EST_SERVEUR
+    ota_serveur_demarrer();
+#endif
+
+    /* 10. Lancer la tâche principale */
     xTaskCreate(app_tache_principale, "tache_princ", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Initialisation terminée. Système %s.",
