@@ -371,7 +371,9 @@ static esp_err_t handler_status(httpd_req_t *req)
     cJSON_AddBoolToObject(json, "sonde_ok", etat_ar.sonde_niveau_ok);
     /* Info réseau */
     int64_t now = esp_timer_get_time() / 1000;
-    cJSON_AddStringToObject(json, "master", s_carte_master == CARTE_ID_AVANT ? "AV" : "AR");
+    cJSON_AddStringToObject(json, "master",
+        s_carte_master == CARTE_ID_AVANT   ? "AV" :
+        s_carte_master == CARTE_ID_ARRIERE ? "AR" : "SRV");
     cJSON_AddBoolToObject(json, "link_av", (now - s_derniere_maj_avant) < 5000);
     cJSON_AddBoolToObject(json, "link_ar", (now - s_derniere_maj_arriere) < 5000);
     char *str = cJSON_PrintUnformatted(json);
