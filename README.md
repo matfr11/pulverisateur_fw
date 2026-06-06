@@ -7,7 +7,7 @@ Système de contrôle embarqué pour pulvérisateur agricole à 3 cartes ESP32 c
 ## Architecture
 
 ```
-CARTE_SERVEUR  (192.168.4.1)
+CARTE_SERVEUR  (192.168.4.1 · pulve-srv.local)
 │  WiFi AP · Broker MQTT · Web UI · Proxy OTA
 │
 ├── CARTE_AVANT   (pulve-av.local)
@@ -22,6 +22,33 @@ CARTE_SERVEUR  (192.168.4.1)
 - **MQTT** : broker embarqué sur le serveur (port 1883). Toutes les cartes publient leur état et reçoivent des commandes via MQTT.
 - **Web UI** : accessible sur `http://192.168.4.1` depuis n'importe quel appareil connecté à `PULVE_AP`.
 - **mDNS** : chaque carte annonce son hostname (`pulve-av.local`, `pulve-ar.local`, `pulve-srv.local`).
+
+---
+
+## Fonctionnalités
+
+### Interface Web
+- Dashboard 3 slides : Unité de pompage · Automate · Vannes & phares arrière
+- Jauges temps réel (débit, volume transféré, progression brassage, niveau cuve)
+- **Mode jour / nuit** : bascule ☽/☀ dans le bandeau, choix persisté via `localStorage`
+- **Version firmware** affichée dans le bandeau, synchronisée automatiquement avec `VERSION_FIRMWARE`
+- Page Settings : modification de tous les paramètres (facteur K, sécurités, brassage, cuve)
+
+### Automatismes
+- **Transfert automatique** : pompe + vanne 3 voies, arrêt automatique sur volume cible
+- **Brassage automatique** : cycles marche/pause configurables, suspendu pendant un transfert
+- **Sécurité cuve vide** : détection débit bas avec délai configurable, réarmement manuel ou automatique
+
+### OTA sans câble
+Depuis la page Settings du serveur, flasher n'importe quelle carte sans USB :
+
+| Bouton | Cible | Mécanisme |
+|--------|-------|-----------|
+| SERVEUR | Carte serveur | Upload direct |
+| CARTE AVANT | `pulve-av.local` | Proxy streaming mDNS → mini serveur OTA |
+| CARTE ARRIÈRE | `pulve-ar.local` | Proxy streaming mDNS → mini serveur OTA |
+
+Le proxy streame le firmware par chunks de 4 KB — jamais plus de 4 KB en RAM simultanément.
 
 ---
 
@@ -58,7 +85,7 @@ echo "alias get_idf='. \$HOME/esp/esp-idf/export.sh'" >> ~/.bashrc
 # Depuis la racine du dépôt
 get_idf   # charger l'environnement (ou source ~/esp/esp-idf/export.sh)
 
-./build_all.sh 6.2
+./build_all.sh 6.1.4
 ```
 
 Le script :
@@ -98,14 +125,6 @@ idf.py -C carte_relais -p /dev/ttyUSB0 flash
 2. Ouvrir `http://192.168.4.1` → onglet **Settings**
 3. Section **MISE À JOUR FIRMWARE** : choisir le fichier `.bin` puis cliquer sur la carte cible
 
-| Bouton | Cible |
-|--------|-------|
-| SERVEUR | Carte serveur elle-même |
-| CARTE AVANT | `pulve-av.local` via proxy mDNS |
-| CARTE ARRIÈRE | `pulve-ar.local` via proxy mDNS |
-
-> Le proxy streame le firmware par chunks de 4 KB — jamais plus de 4 KB en RAM simultanément.
-
 ---
 
 ## Tests
@@ -124,8 +143,9 @@ make run
 | `test_securites.c` | 12 | Machine à états cuve vide (injection de temps) |
 | `test_automatismes.c` | 17 | Machines à états transfert et brassage |
 | `test_ota_proxy.c` | 6 | Construction URL OTA, mapping hostname mDNS |
+| `test_capteurs.c` | 3 | Débitmètre OK/KO, réarmement après impulsions |
 
-**Total : 61 tests.**
+**Total : 64 tests.**
 
 ---
 
@@ -139,7 +159,7 @@ pulverisateur_fw/
 │   │   ├── types_pulverisateur.h    # Types partagés, VERSION_FIRMWARE
 │   │   └── mqtt_topics.h            # Topics MQTT, credentials WiFi
 │   ├── protocoles/
-│   │   ├── protocole_wifi.c         # WiFi AP/STA
+│   │   ├── protocole_wifi.c         # WiFi AP/STA, reconnexion par timer
 │   │   └── protocole_mqtt.c         # Client MQTT + sérialisation JSON
 │   └── broker_mqtt/
 │       └── broker_mqtt.c            # Broker MQTT embarqué (MQTT 3.1.1)
@@ -147,7 +167,7 @@ pulverisateur_fw/
 ├── carte_relais/
 │   ├── main/
 │   │   ├── board_config.h           # Sélection de la carte (AVANT/ARRIERE/SERVEUR)
-│   │   ├── app_init.c               # Séquence d'initialisation
+│   │   ├── app_init.c               # Séquence d'initialisation et tâche principale
 │   │   └── idf_component.yml        # Dépendance mdns (component manager)
 │   ├── components/
 │   │   ├── gestion_actionneurs/
@@ -165,3 +185,31 @@ pulverisateur_fw/
     ├── mocks/                       # Stubs ESP-IDF pour gcc Linux
     └── test_*.c
 ```
+
+---
+
+## Changelog
+
+### v6.1.4
+- Web UI : mode jour/nuit (☽/☀) avec persistance `localStorage`
+- Web UI : note de version synchronisée avec `VERSION_FIRMWARE` à la compilation
+- Fix : champ `master` du JSON `/status` retournait `"AR"` à tort sur la carte serveur
+
+### v6.1.2 / v6.1.3
+- Fix : facteur K débitmètre ignorait la NVS au démarrage (toujours 4.72 par défaut)
+- Fix : suppression du check de version côté cartes relais — la carte serveur est la source autoritaire ; les mises à jour de paramètres ne pouvaient plus être appliquées si la NVS serveur avait été réinitialisée
+
+### v6.1.1
+- 9 correctifs issus de la revue de code :
+  - WiFi : `vTaskDelay` en handler d'événement remplacé par `esp_timer` one-shot
+  - MQTT : buffer JSON partagé → buffer local par fonction (thread-safe)
+  - Web UI : mutex sur `s_etat_avant` / `s_etat_arriere`
+  - Config : mutex sur `s_config` + copie locale avant usage
+  - Broker MQTT : mutex dans `client_deconnecter()`, accept et comptage clients
+  - Broker MQTT : enforcement keepalive (timeout × 1.5)
+  - Broker MQTT : correction codec longueur dans `envoyer_suback()`
+  - Automatismes : état `AUTO_TR_TERMINE` visible une itération avant reset
+  - Capteurs : débitmètre marqué KO après `ABSENCE_TIMEOUT_CYCLES` sans impulsion
+- Suite de tests portée à 64 tests (ajout `test_capteurs.c`)
+- OTA proxy streaming serveur → cartes relais via mDNS
+- Hostname mDNS par carte (`pulve-av.local`, `pulve-ar.local`, `pulve-srv.local`)
